@@ -1,23 +1,21 @@
-const Router = require("express").Router;
-const router = new Router();
-
+const express = require("express");
 const Company = require("../models/company");
 const ExpressError = require("../helpers/expressError");
 
+const router = new express.Router();
 /** GET / return the handle and name for all company objects
  * {companies: [{handle, name},...]}
  * allows for multiple optional query paraemters
  */
 
-router.get("/:parameters?", async function (req, res, next) {
+router.get("/", async function (req, res, next) {
     try{
-        const parameters = req.params.parameters;
+        let parameters = req.query;
         let listOfCompanies;
 
         /**If optional parameters are present, pass them to the function*/
         if (parameters) {
-            const listOfParameters = parameters.split("&");
-            listOfCompanies = await Company.all(listOfParameters);
+            listOfCompanies = await Company.all(parameters);
         } else {
             listOfCompanies = await Company.all();
         }
@@ -33,6 +31,19 @@ router.get("/:parameters?", async function (req, res, next) {
     }
 });
 
+/** GET /[handle] get company by its handle return 
+ *      {company: {handle, name, num_employees, description, logo_url}}
+ */
+
+router.get("/:handle", async function (req, res, next) {
+    try {
+        const company = await Company.get(req.params.handle);
+        return res.json({ company: company });
+    } catch (err) {
+        return next(err);
+    }
+});
+
 
 /** POST / create a new company and return ---
  *      {company: {handle, name, num_employees, description, logo_url}}
@@ -45,7 +56,13 @@ router.post("/", async function (req, res, next) {
     } catch (err) {
         return next(err)
     }
-})
+});
+
+/**  */
+
+
+
+
 
 
 
