@@ -22,12 +22,30 @@ router.get("/:parameters?", async function (req, res, next) {
             listOfCompanies = await Company.all();
         }
 
+        //if no companies are found that match, throw 404
+        if(listOfCompanies.length === 0){
+            throw new ExpressError("No companies found by this search", 404)
+        }
+
         return res.json({ companies: listOfCompanies })  
     } catch (err) {
         return next(err)
     }
 });
 
+
+/** POST / create a new company and return ---
+ *      {company: {handle, name, num_employees, description, logo_url}}
+ */
+
+router.post("/", async function (req, res, next) {
+    try{
+        const company = await Company.create(req.body)
+        return res.json({ company: company })
+    } catch (err) {
+        return next(err)
+    }
+})
 
 
 
