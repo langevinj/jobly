@@ -58,7 +58,18 @@ router.post("/", async function (req, res, next) {
     }
 });
 
-/**  */
+/**  PATCH /[handle] update an existing company and return
+ *       {company: {handle, name, num_employees, description, logo_url}}
+*/
+
+router.patch("/:handle", async function (req, res, next) {
+    try{
+        const company = await Company.update(req.params.handle, req.body)
+        return res.json({ company: company })
+    } catch (err) {
+        return next(err)
+    }
+});
 
 
 

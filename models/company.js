@@ -1,6 +1,8 @@
 
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
+const sqlForPartialUpdate = require("../helpers/partialUpdate");
+const partialUpdate = require("../helpers/partialUpdate")
 
 class Company {
 
@@ -81,6 +83,20 @@ class Company {
       }
 
       return result.rows[0];
+  }
+
+  /** update an existing company given its handle, return 
+   * {handle, name, num_employees, description, logo_url}
+   */
+  static async update(handle, data){
+      let response = sqlForPartialUpdate("companies", data, "handle", handle)
+      const result = await db.query(response.query, response.values)
+
+      if(!result.rows[0]){
+          throw new ExpressError(`No such company with handle: ${handle}`, 404);
+      }
+
+      return result.rows[0]
   }
 
   
