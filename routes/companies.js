@@ -1,7 +1,9 @@
 const express = require("express");
+
 const Company = require("../models/company");
 const ExpressError = require("../helpers/expressError");
 const jsonschema = require("jsonschema");
+
 const companySchema = require("../schema/companySchema");
 const companyPartialSchema = require("../schema/companyPartialSchema");
 
@@ -11,23 +13,9 @@ const router = new express.Router();
  * allows for multiple optional query paraemters
  */
 
-router.get("/", async function (req, res, next) {
+router.get('/', async function (req, res, next) {
     try{
-        let parameters = req.query;
-        let listOfCompanies;
-
-        /**If optional parameters are present, pass them to the function*/
-        if (parameters) {
-            listOfCompanies = await Company.all(parameters);
-        } else {
-            listOfCompanies = await Company.all();
-        }
-
-        //if no companies are found that match, throw 404
-        if(listOfCompanies.length === 0){
-            throw new ExpressError("No companies found by this search", 404)
-        }
-
+        const listOfCompanies = await Company.all(req.query);
         return res.json({ companies: listOfCompanies })  
     } catch (err) {
         return next(err)
@@ -77,7 +65,7 @@ router.patch("/:handle", async function (req, res, next) {
         let error = new ExpressError(listOfErrors, 400);
         return next(error);
     }
-    
+
     try{
         const company = await Company.update(req.params.handle, req.body);
         return res.json({ company: company });
@@ -98,16 +86,6 @@ router.delete("/:handle", async function (req, res, next) {
         return next(err);
     } 
 });
-
-
-
-
-
-
-
-
-
-
 
 
 

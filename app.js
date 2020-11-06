@@ -12,11 +12,13 @@ const companiesRoutes = require("./routes/companies");
 
 app.use(express.json());
 
-/** routes */
-app.use("/companies", companiesRoutes);
+
 
 // add logging system
 app.use(morgan("tiny"));
+
+/** routes */
+app.use("/companies", companiesRoutes);
 
 /** 404 handler */
 

@@ -29,7 +29,7 @@ class Company {
    *    [{handle, name},...]
    */
 
-  static async all(parameters=false){
+  static async all(parameters){
     
     //if no parameters are present, get ALL companies
     if(!parameters){
