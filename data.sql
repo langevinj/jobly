@@ -5,3 +5,5 @@ CREATE TABLE companies (
     description text,
     logo_url text
 );
+
+
