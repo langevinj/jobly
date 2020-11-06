@@ -9,7 +9,7 @@
         {
             "handle": "apple",
             "name": "Apple",
-            "num_employee": 4000,
+            "num_employees": 4000,
             "description": "Tech and computers",
             "logo_url": "www.apple.com"
         }
@@ -35,10 +35,10 @@
                 "Apple"
             ]
         },
-        "num_employee": {
-            "$id": "#/properties/num_employee",
+        "num_employees": {
+            "$id": "#/properties/num_employees",
             "type": "integer",
-            "title": "The num_employee schema",
+            "title": "The num_employees schema",
             "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
