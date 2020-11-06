@@ -51,10 +51,10 @@ router.get("/:handle", async function (req, res, next) {
 
 router.post("/", async function (req, res, next) {
     try{
-        const company = await Company.create(req.body)
-        return res.json({ company: company })
+        const company = await Company.create(req.body);
+        return res.json({ company: company });
     } catch (err) {
-        return next(err)
+        return next(err);
     }
 });
 
@@ -64,11 +64,24 @@ router.post("/", async function (req, res, next) {
 
 router.patch("/:handle", async function (req, res, next) {
     try{
-        const company = await Company.update(req.params.handle, req.body)
-        return res.json({ company: company })
+        const company = await Company.update(req.params.handle, req.body);
+        return res.json({ company: company });
     } catch (err) {
-        return next(err)
+        return next(err);
     }
+});
+
+/** DELETE /[handle]  remove company from table and return
+ *      {message: "Company deleted"}
+*/
+
+router.delete("/:handle", async function (req, res, next) {
+    try {
+        const response = await Company.remove(req.params.handle);
+        return res.json({message: response});
+    } catch (err) {
+        return next(err);
+    } 
 });
 
 

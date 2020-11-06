@@ -99,6 +99,21 @@ class Company {
       return result.rows[0]
   }
 
+  /** remove an existing company and return message: "Company deleted"
+   */
+
+  static async remove(handle){
+    const result = await db.query(
+        `DELETE FROM companies WHERE handle = $1
+            RETURNING handle`, [handle]);
+    
+    if(!result.rows[0]){
+        throw new ExpressError(`No such company with handle: ${handle}`, 404);
+    }
+
+    return "Company deleted"
+  }
+
   
 }
 
