@@ -1,6 +1,9 @@
 const express = require("express");
 const Company = require("../models/company");
 const ExpressError = require("../helpers/expressError");
+const jsonschema = require("jsonschema");
+const companySchema = require("../schema/companySchema");
+const companyPartialSchema = require("../schema/companyPartialSchema");
 
 const router = new express.Router();
 /** GET / return the handle and name for all company objects
@@ -50,12 +53,16 @@ router.get("/:handle", async function (req, res, next) {
  */
 
 router.post("/", async function (req, res, next) {
-    try{
-        const company = await Company.create(req.body);
-        return res.json({ company: company });
-    } catch (err) {
-        return next(err);
+    const result = jsonschema.validate(req.body, companySchema)
+
+    if(!result.valid){
+        let listOfErrors = result.errors.map(err => err.stack)
+        let error = new ExpressError(listOfErrors, 400);
+        return next(error);
     }
+
+    const company = await Company.create(req.body);
+    return res.json({ company: company });
 });
 
 /**  PATCH /[handle] update an existing company and return
@@ -63,6 +70,14 @@ router.post("/", async function (req, res, next) {
 */
 
 router.patch("/:handle", async function (req, res, next) {
+    const result = jsonschema.validate(req.body, companyPartialSchema)
+
+    if (!result.valid) {
+        let listOfErrors = result.errors.map(err => err.stack)
+        let error = new ExpressError(listOfErrors, 400);
+        return next(error);
+    }
+    
     try{
         const company = await Company.update(req.params.handle, req.body);
         return res.json({ company: company });
