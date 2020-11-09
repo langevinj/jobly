@@ -13,6 +13,11 @@ const Company = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly
 
 describe("Company Routes Test", function () {
 
+    // remove console.error from tests designed to fail, can be commented out as needed
+    beforeAll(() => {
+        jest.spyOn(console, 'error').mockImplementation(jest.fn());
+    })
+
     //clear out table and create sample data
     beforeEach(async function() {
         await db.query("DELETE FROM companies");
@@ -164,21 +169,60 @@ describe("Company Routes Test", function () {
         });
 
         test("400 if parameters are not valid", async () => {
-            try{
-                await request(app).post("/companies")
-                    .send({
-                        handle: "ibm",
-                        name: "IBM",
-                        num_employees: 1000,
-                        description: "IT services",
-                        logo_url: "asdfghjkl"
-                    });
-            } catch (e)  {
-                expect(e).toMatch('error')
-                expect(e.status).toEqual(400)
-            }
+            let response = await request(app).post("/companies")
+                .send({
+                    handle: "ibm",
+                    name: "IBM",
+                    num_employees: 1000,
+                    description: "IT services",
+                    logo_url: "asdfghjkl"
+                });
+            
+            expect(response.statusCode).toEqual(400)
         });
     });
+
+    /** PATCH /:handle updates an existing company =>
+     *      {company: {handle, name, num_employees, description, logo_url}}
+     */
+
+    describe("PATCH /:handle", function () {
+        test("updates an existing company", async function(){
+            let response = await request(app).patch("/companies/apple")
+                .send({
+                    name: "Macintosh",
+                    num_employees: 10000
+                });
+
+            expect(response.body).toEqual({
+                "company": {
+                    "handle": "apple",
+                    "name": "Macintosh",
+                    "num_employees": 10000,
+                    "description": "Tech and computers",
+                    "logo_url": "www.apple.com"
+                }
+            });
+
+            let result = await Company.all()
+
+            //check that the already existing company was changed
+            expect(result.length).toEqual(1)
+        });
+
+        test("400 if parameters passed are not valid", async function(){
+            let response = await request(app).patch("/companies/apple")
+                .send({
+                    num_employees: "10000",
+                    language: "english"
+                });
+            expect(response.statusCode).toEqual(400)
+        });
+    });
+
+
+
+
 
 
     
