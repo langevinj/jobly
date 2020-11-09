@@ -6,4 +6,14 @@ CREATE TABLE companies (
     logo_url text
 );
 
+CREATE TABLE jobs (
+    id serial PRIMARY KEY,
+    title text NOT NULL,
+    salary float NOT NULL,
+    equity float NOT NULL CHECK (equity <= 1.0),
+    company_handle text REFERENCES companies ON DELETE CASCADE,
+    date_posted timestamp DEFAULT CURRENT_TIMESTAMP
+)
+
+
 
