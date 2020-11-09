@@ -220,12 +220,29 @@ describe("Company Routes Test", function () {
         });
     });
 
+    /** DELETE /:handle remove a company =>
+     *      {message: "Company deleted"}
+     */
 
+    describe("DELETE /:handle", function() {
+        test("delete a company given a handle", async function(){
+            let response = await request(app).delete("/companies/apple")
 
+            expect(response.body).toEqual({
+                "message": "Company deleted"
+            });
 
+            let result = await Company.all()
 
+            //Check that the company was actually deleted
+            expect(result.length).toEqual(0)
+        });
 
-    
+        test("404 if no company with given handle", async function() {
+            let response = await request(app).delete("/companies/ibm")
 
+            expect(response.statusCode).toEqual(404)
+        }); 
+    });
 
 });
