@@ -29,10 +29,10 @@ class Company {
    *    [{handle, name},...]
    */
 
-  static async all(parameters){
+  static async all(parameters=false){
     
     //if no parameters are present, get ALL companies
-    if(!parameters){
+    if(parameters === false){
         const result = await db.query(`SELECT handle, name FROM companies`);
         return result.rows;
     } else {

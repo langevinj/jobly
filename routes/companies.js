@@ -15,9 +15,18 @@ const router = new express.Router();
 
 router.get('/', async function (req, res, next) {
     try{
-        const listOfCompanies = await Company.all(req.query);
+        let listOfCompanies;
+
+        //check if any parameters are present
+        if(Object.keys(req.query).length === 0){
+            listOfCompanies = await Company.all()
+        } else {
+            listOfCompanies = await Company.all(req.query);
+        }
+
         return res.json({ companies: listOfCompanies })  
     } catch (err) {
+
         return next(err)
     }
 });

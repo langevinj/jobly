@@ -110,6 +110,32 @@ describe("Company Routes Test", function () {
             expect(response.statusCode).toEqual(400)
         });
     });
+
+    /** GET /:handle =>  {company: {handle, name, num_employees, description, logo_url}}*/
+
+    describe("GET /:handle", function (){
+        test("gets a company given its handle", async function() {
+            let response = await request(app)
+                .get("/companies/apple")
+
+            expect(response.body).toEqual({
+                "company": {
+                    "handle": "apple",
+                    "name": "Apple",
+                    "num_employees": 4000,
+                    "description": "Tech and computers",
+                    "logo_url": "www.apple.com"
+                }
+            });
+        });
+
+        test("404 if no company with the given handle", async function(){ 
+            let response = await request(app)
+                .get("/companies/ibm")
+
+            expect(response.statusCode).toEqual(404)
+        })
+    });
     
 
 
