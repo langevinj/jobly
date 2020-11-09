@@ -12,13 +12,27 @@ const jobPartialSchema = require("../schema/jobPartialSchema");
 
 const router = new express.Router();
 
+/** GET / return the title and company handle for all job objects
+ *      {jobs: [{title, company_handle},...]}
+ * allows for multiple optional query paraemters
+ */
+
 router.get("/", async function (req, res, next) {
     try {
+        let listOfJobs;
 
+        //check if any parameters are present
+        if (Object.keys(req.query).length === 0) {
+            listOfJobs = await Job.all()
+        } else {
+            listOfJobs = await Job.all(req.query);
+        }
+
+        return res.json({ jobs: listOfJobs})
     } catch (err) {
         return next(err)
     }
-})
+});
 
 // router.get("/:id", async function (req, res, next) {
 //     try {

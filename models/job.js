@@ -20,6 +20,40 @@ class Job {
             [title, salary, equity, company_handle]);
         return result.rows[0]
     }
+
+
+    /** Retrieve a list of all jobs -- returns
+   *    [{title, company_handle},...]
+   */
+
+    static async all(parameters = false) {
+
+        //if no parameters are present, get ALL jobs
+        if (parameters === false) {
+            const result = await db.query(`SELECT title, company_handle FROM jobs`);
+            return result.rows;
+        } else {
+            let columns = [];
+            if ('search' in parameters) {
+                columns.push(`title ILIKE '%${parameters['search']}%'`)
+            }
+
+            if ('min_salary' in parameters) {
+                columns.push(`salary > ${parameters['min_salary']}`)
+            }
+
+            if ('min_equity' in parameters) {
+                columns.push(`equity > ${parameters['min_equity']}`)
+            }
+
+            //construct query with parameters
+            let cols = columns.join(' AND ');
+            const result = await db.query(`SELECT title, company_handle FROM jobs
+                        WHERE ${cols}`)
+            return result.rows
+        }
+    }
+
 }
 
 module.exports = Job;
