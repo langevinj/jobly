@@ -12,6 +12,7 @@ const jobPartialSchema = require("../schema/jobPartialSchema");
 
 const router = new express.Router();
 
+
 /** GET / return the title and company handle for all job objects
  *      {jobs: [{title, company_handle},...]}
  * allows for multiple optional query paraemters
@@ -31,7 +32,7 @@ router.get("/", async function (req, res, next) {
         return res.json({ jobs: listOfJobs})
     } catch (err) {
         return next(err)
-    }
+  }
 });
 
 /** GET ./[id] get a job by its handle, return
@@ -47,7 +48,8 @@ router.get("/:id", async function (req, res, next) {
     } catch (err) {
         return next(err)
     }
-})
+});
+
 
 /** POST / create a new job and return the job
  *      {job: jobData}
@@ -68,15 +70,30 @@ router.post("/", async function (req, res, next) {
     } catch (err) {
         return next(err);
     }
+});
+
+
+/** update an existing job given its id, return
+*         {job: jobData}
+*/
+
+router.patch("/:id", async function (req, res, next) {
+    const result = jsonschema.validate(req.body, jobPartialSchema)
+
+    if (!result.valid) {
+        let listOfErrors = result.errors.map(err => err.stack)
+        let error = new ExpressError(listOfErrors, 400);
+        return next(error);
+    }
+
+    try {
+        const job = await Job.update(req.params.id, req.body);
+
+        return res.json({ job: job });
+    } catch (err) {
+        return next(err)
+    }
 })
-
-// router.patch("/:id", async function (req, res, next) {
-//     try {
-
-//     } catch (err) {
-//         return next(err)
-//     }
-// })
 
 // router.delete("/:id", async function (req, res, next) {
 //     try {

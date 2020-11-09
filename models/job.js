@@ -2,6 +2,7 @@
 
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
+const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
 class Job {
 
@@ -74,7 +75,7 @@ class Job {
             WHERE id = $1`, [id]);
 
         if (!result.rows[0]) {
-            throw new ExpressError(`No such job with handle: ${id}`, 404);
+            throw new ExpressError(`No such job with id: ${id}`, 404);
         }
 
         let data = result.rows[0]
@@ -93,6 +94,23 @@ class Job {
             "date_posted": data.date_posted
         }
     }
+
+
+    /** update an existing job given its id, return 
+    *    {title, salary, equity, company_handle, date_posted}
+    */
+
+    static async update(id, data) {
+        let response = sqlForPartialUpdate("jobs", data, "id", id)
+        const result = await db.query(response.query, response.values)
+
+        if (!result.rows[0]) {
+            throw new ExpressError(`No such job with id: ${id}`, 404);
+        }
+
+        return result.rows[0]
+    }
+
 
 }
 
