@@ -19,11 +19,12 @@ describe("Job Routes Test", function () {
     // remove console.error from tests designed to fail, can be commented out as needed
     beforeAll(() => {
         jest.spyOn(console, 'error').mockImplementation(jest.fn());
-    })
+    });
 
     //clear out table and create sample data
     beforeEach(async function () {
         await db.query("DELETE FROM companies");
+        await db.query("DELETE FROM jobs")
 
         let c1 = await Company.create({
             handle: "apple",
