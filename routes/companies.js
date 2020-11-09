@@ -1,3 +1,5 @@
+//Routes for companies
+
 const express = require("express");
 
 const Company = require("../models/company");
