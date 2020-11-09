@@ -240,9 +240,4 @@ describe("Job Routes Test", function () {
         });
     });
 
-
-
-
-
-
 });
