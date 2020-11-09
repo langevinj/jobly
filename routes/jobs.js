@@ -34,13 +34,20 @@ router.get("/", async function (req, res, next) {
     }
 });
 
-// router.get("/:id", async function (req, res, next) {
-//     try {
+/** GET ./[id] get a job by its handle, return
+ *      {job: jobData}
+ * 
+ */
 
-//     } catch (err) {
-//         return next(err)
-//     }
-// })
+router.get("/:id", async function (req, res, next) {
+    try {
+        const job = await Job.get(req.params.id)
+
+        return res.json({ job: job })
+    } catch (err) {
+        return next(err)
+    }
+})
 
 /** POST / create a new job and return the job
  *      {job: jobData}
