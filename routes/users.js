@@ -6,6 +6,10 @@ const User = require("../models/user");
 const ExpressError = require("../helpers/expressError");
 const jsonschema = require("jsonschema");
 
+const userSchema = require("../schema/userSchema");
+const userPartialSchema = require("../schema/userPartialSchema");
+const { json } = require("express");
+
 const router = new express.Router();
 
 
@@ -41,6 +45,14 @@ router.get("/:username", async function (req, res, next) {
  *              {user: username}
  */
 router.post("/", async function(req, res, next) {
+    const result = jsonschema.validate(req.body, userSchema);
+
+    if (!result.valid) {
+        let listOfErrors = result.errors.map(err => err.stack)
+        let error = new ExpressError(listOfErrors, 400);
+        return next(error);
+    }
+
     try{
         const user = await User.register(req.body);
 
@@ -55,6 +67,14 @@ router.post("/", async function(req, res, next) {
  */
 
 router.patch("/:username", async function (req, res, next) {
+    const result = jsonschema.validate(req.body, userPartialSchema);
+
+    if (!result.valid) {
+        let listOfErrors = result.errors.map(err => err.stack)
+        let error = new ExpressError(listOfErrors, 400);
+        return next(error);
+    }
+
     try {
         const user = await User.update(req.params.username, req.body);
 
@@ -70,7 +90,7 @@ router.patch("/:username", async function (req, res, next) {
 
 router.delete("/:username", async function (req, res, next) {
     try {
-        const response = User.remove(req.params.username)
+        const response = await User.remove(req.params.username)
 
         return res.json({ message: response });
     } catch (err) {
