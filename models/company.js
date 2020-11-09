@@ -2,6 +2,7 @@
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
+const Job = require("./job");
 
 class Company {
 
@@ -65,6 +66,7 @@ class Company {
 
   /** get a company by its handle, return
    *  {handle, name, num_employees, description, logo_url}
+   * and list of jobs at that company jobs: [job, ...]
    */
 
   static async get(handle) {
@@ -81,7 +83,17 @@ class Company {
         throw new ExpressError(`No such company with handle: ${handle}`, 404);
       }
 
-      return result.rows[0];
+      let company = result.rows[0]
+
+      const allJobs = await Job.all()
+      let arrayOfJobs = [];
+      for(let i=0; i<allJobs.length; i++){
+        if(allJobs[i].company_handle === handle){
+            arrayOfJobs.push(allJobs[i])
+        }
+      }
+
+      return {company, "jobs": arrayOfJobs}
   }
 
   /** update an existing company given its handle, return 

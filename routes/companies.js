@@ -34,7 +34,7 @@ router.get('/', async function (req, res, next) {
 });
 
 /** GET /[handle] get company by its handle return 
- *      {company: {handle, name, num_employees, description, logo_url}}
+ *      {company: {handle, name, num_employees, description, logo_url, jobs: [job, ...]}}
  */
 
 router.get("/:handle", async function (req, res, next) {
