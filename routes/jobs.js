@@ -73,7 +73,8 @@ router.post("/", async function (req, res, next) {
 });
 
 
-/** update an existing job given its id, return
+/** PATCH /[id]
+ * update an existing job given its id, return
 *         {job: jobData}
 */
 
@@ -93,15 +94,22 @@ router.patch("/:id", async function (req, res, next) {
     } catch (err) {
         return next(err)
     }
-})
+});
 
-// router.delete("/:id", async function (req, res, next) {
-//     try {
 
-//     } catch (err) {
-//         return next(err)
-//     }
-// })
+/** DELETE /[id]  remove job from table and return
+ *      {message: "Job deleted"}
+*/
+
+router.delete("/:id", async function (req, res, next) {
+    try {
+        const response = await Job.remove(req.params.id);
+
+        return res.json({ message: response });
+    } catch (err) {
+        return next(err)
+    }
+});
 
 
 

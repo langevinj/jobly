@@ -111,6 +111,20 @@ class Job {
         return result.rows[0]
     }
 
+    /** remove an existing job return "Job deleted" */
+
+    static async remove(id) {
+        const result = await db.query(
+            `DELETE FROM jobs WHERE id = $1
+            RETURNING id`, [id]);
+
+        if (!result.rows[0]) {
+            throw new ExpressError(`No such job with id: ${id}`, 404);
+        }
+
+        return "Job deleted"
+    }
+
 
 }
 
