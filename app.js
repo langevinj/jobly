@@ -9,6 +9,7 @@ const morgan = require("morgan");
 const app = express();
 
 const companiesRoutes = require("./routes/companies");
+const jobsRoutes = require("./routes/jobs");
 
 app.use(express.json());
 
@@ -19,6 +20,7 @@ app.use(morgan("tiny"));
 
 /** routes */
 app.use("/companies", companiesRoutes);
+app.use("/jobs", jobsRoutes);
 
 /** 404 handler */
 
