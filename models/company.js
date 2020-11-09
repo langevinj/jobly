@@ -93,7 +93,9 @@ class Company {
         }
       }
 
-      return {company, "jobs": arrayOfJobs}
+      company["jobs"] = arrayOfJobs;
+
+      return company
   }
 
   /** update an existing company given its handle, return 

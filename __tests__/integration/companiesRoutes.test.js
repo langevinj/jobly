@@ -1,4 +1,4 @@
-/** TESTing for companies.js routes 
+/** Testing for companies.js routes 
  * run tests like:
  *          jest companiesRoutes.test.js
 */
@@ -10,6 +10,7 @@ const request = require("supertest");
 const app = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/app.js");
 const db = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/db.js");
 const Company = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/models/company.js");
+const Job = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/models/job.js");
 
 describe("Company Routes Test", function () {
 
@@ -39,6 +40,16 @@ describe("Company Routes Test", function () {
             num_employees: 1000,
             description: "IT services",
             logo_url: "https://www.ibm.com"
+        });
+    }
+
+    //add a job if needed for test
+    async function addJob(){
+        let j1 = await Job.create({
+            title: "Customer Service",
+            salary: 40000,
+            equity: 0.5,
+            company_handle: "apple"
         });
     }
 
@@ -121,16 +132,18 @@ describe("Company Routes Test", function () {
 
     describe("GET /:handle", function (){
         test("gets a company given its handle", async function() {
+            await addJob();
             let response = await request(app)
                 .get("/companies/apple")
-
+            console.log(response.body)
             expect(response.body).toEqual({
                 "company": {
                     "handle": "apple",
                     "name": "Apple",
                     "num_employees": 4000,
                     "description": "Tech and computers",
-                    "logo_url": "www.apple.com"
+                    "logo_url": "www.apple.com",
+                    "jobs": expect.any(Array)
                 }
             });
         });
@@ -218,6 +231,16 @@ describe("Company Routes Test", function () {
                 });
             expect(response.statusCode).toEqual(400)
         });
+
+        test("404 if no company with given handle", async function () {
+            response = await request(app).patch("/companies/asdfghjkl")
+                .send({
+                    name: "Macintosh",
+                    num_employees: 10000
+                });
+
+            expect(response.statusCode).toEqual(404)
+        }); 
     });
 
     /** DELETE /:handle remove a company =>
