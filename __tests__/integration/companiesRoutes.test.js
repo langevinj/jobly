@@ -33,7 +33,7 @@ describe("Company Routes Test", function () {
             name: "IBM",
             num_employees: 1000,
             description: "IT services",
-            logo_url: "www.ibm.com"
+            logo_url: "https://www.ibm.com"
         });
     }
 
@@ -52,7 +52,8 @@ describe("Company Routes Test", function () {
         });
 
         test("can get a filtered list of companies by a searched name", async function(){
-            await addSecondCompany();
+            let ibm = await addSecondCompany();
+            console.log(`IBM: ${ibm}`)
             let response = await request(app)
                 .get("/companies?search=apple")
             
@@ -134,8 +135,52 @@ describe("Company Routes Test", function () {
                 .get("/companies/ibm")
 
             expect(response.statusCode).toEqual(404)
-        })
+        });
     });
+
+    /** POST / creates a new company => {company: {handle, name, num_employees, description, logo_url}}
+    */
+
+    describe("POST /", function(){
+        test("creates a new company given valid parameters", async function(){
+            let response = await request(app)
+                .post("/companies")
+                .send({
+                    handle: "ibm",
+                    name: "IBM",
+                    num_employees: 1000,
+                    description: "IT services",
+                    logo_url: "https://www.ibm.com"
+                })
+            
+            expect(response.body).toEqual({
+                "company":{
+                    "handle": "ibm",
+                    "name": "IBM",
+                    "num_employees": 1000,
+                    "description": "IT services",
+                    "logo_url": "https://www.ibm.com"}
+            })
+        });
+
+        test("400 if parameters are not valid", async () => {
+            try{
+                await request(app).post("/companies")
+                    .send({
+                        handle: "ibm",
+                        name: "IBM",
+                        num_employees: 1000,
+                        description: "IT services",
+                        logo_url: "asdfghjkl"
+                    });
+            } catch (e)  {
+                expect(e).toMatch('error')
+                expect(e.status).toEqual(400)
+            }
+        });
+    });
+
+
     
 
 
