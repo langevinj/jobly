@@ -1,5 +1,6 @@
 const Company = require("./models/company");
 const Job = require("./models/job");
+const User = require("./models/user")
 const db = require("./db");
 const { JsonWebTokenError } = require("jsonwebtoken");
 
@@ -27,4 +28,13 @@ Job.create({
     salary: 70000.00,
     equity: 0.5,
     company_handle: "apple"
+});
+
+User.register({
+    username: "testuser",
+    pwd: "abc123",
+    first_name: "Test",
+    last_name: "Testy",
+    email: "testuser@test.com",
+    is_admin: true
 });

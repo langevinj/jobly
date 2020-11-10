@@ -57,7 +57,7 @@ class User{
          return result.rows;
      }
 
-     //get a users by their username and return all fields excludingm password
+     //get a users by their username and return all fields excluding password
      static async get(username){
          const result = await db.query(
              `SELECT username,
@@ -69,11 +69,49 @@ class User{
                 WHERE username = $1`,
                 [username]);
 
-         if (!result.rows[0]) {
-             throw new ExpressError(`No such user with username: ${username}`, 404);
-         }
+        if (!result.rows[0]) {
+            throw new ExpressError(`No such user with username: ${username}`,404);
+        }
+        const jobs = await db.query(
+            `SELECT title,
+                   salary,
+                   equity,
+                   company_handle,
+                   date_posted,
+                   state,
+                   created_at
+           FROM users
+           JOIN applications ON users.username = applications.username
+           JOIN jobs ON applications.job_id = jobs.id
+           WHERE users.username = $1`, [username]
+        );
 
-         return result.rows[0]
+
+        let user = result.rows[0]
+        let allJobs = jobs.rows
+        let arrayOfJobs = []
+        
+        if(jobs.rows[0]){
+            for (let i = 0; i < allJobs.length; i++) {
+                let tempJob = {
+                    title: allJobs[i].title,
+                    salary: allJobs[i].salary,
+                    equity: allJobs[i].equity,
+                    company_handle: allJobs[i].company_handle,
+                    date_posted: allJobs[i].date_posted,
+                    application: {
+                        state: allJobs[i].state,
+                        created_at: allJobs[i].created_at
+                    }
+                }
+                arrayOfJobs.push(tempJob);
+            }
+        }
+
+        user['jobs'] = arrayOfJobs
+        
+
+        return user
      }
 
      /** Update an existing user and return all fields exlcuding the password
