@@ -19,12 +19,23 @@ function authenticateJWT(req, res, next) {
 }
 
 function ensureLoggedIn(req, res, next) {
-    if(!req.user) {
-        const e = new ExpressError("Unauthorized", 401);
-        return next(e);
-    } else {
-        return next();
+    try{
+        const tokenFromBody = req.body.token;
+
+        let token = jwt.verify(tokenFromBody, SECRET_KEY)
+        res.locals.username = token.username;
+
+        if (token.username === req.params.username){
+            return next();
+        }
+        throw new Error();
+    } catch (err) {
+        return next(new ExpressError("Unauthorized", 401))
     }
+}
+
+function ensureAdmin(req, res, next) {
+    
 }
 
 

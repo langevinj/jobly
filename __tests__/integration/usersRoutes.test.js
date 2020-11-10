@@ -93,6 +93,7 @@ describe("User Routes Test", function () {
                     last_name: "Smith",
                     email: "johnsmith@gmail.com"});
             expect(response.body).toEqual({user: {username: "testuser2"}})
+            expect(response.statusCode).toEqual(201);
 
             //check that user was added to db
             const result = await User.all()

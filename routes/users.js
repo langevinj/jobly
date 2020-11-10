@@ -11,7 +11,8 @@ const userSchema = require("../schema/userSchema");
 const userPartialSchema = require("../schema/userPartialSchema");
 const { json } = require("express");
 const { SECRET_KEY } = require("../config");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
+const makeToken = require("../helpers/makeToken")
 
 const router = new express.Router();
 
@@ -58,8 +59,8 @@ router.post("/", async function(req, res, next) {
 
     try{
         const user = await User.register(req.body);
-        let token = jwt.sign({ user }, SECRET_KEY);
-        return res.json({ token });
+        let token = makeToken(user);
+        return res.status(201).json({ token });
     } catch (err) {
         return next(err);
     }
@@ -69,7 +70,7 @@ router.post("/", async function(req, res, next) {
  *      {user: {username, first_name, last_name, email, photo_url}}
  */
 
-router.patch("/:username", async function (req, res, next) {
+router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
     const result = jsonschema.validate(req.body, userPartialSchema);
 
     if (!result.valid) {
