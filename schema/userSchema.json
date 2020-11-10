@@ -12,7 +12,8 @@
             "first_name": "Test",
             "last_name": "Testy",
             "email": "test@test.com",
-            "photo_url": "www.photo.com"
+            "photo_url": "www.photo.com",
+            "is_admin": true
         }
     ],
     "required": [
@@ -83,6 +84,16 @@
             "default": "",
             "examples": [
                 "www.photo.com"
+            ]
+        },
+        "is_admin": {
+            "$id": "#/properties/is_admin",
+            "type": "boolean",
+            "title": "the is_admin schema",
+            "description": "Whether or not a user is an admin",
+            "default": false,
+            "examples": [
+                false
             ]
         }
     },

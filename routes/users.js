@@ -10,8 +10,7 @@ const jwt = require("jsonwebtoken");
 const userSchema = require("../schema/userSchema");
 const userPartialSchema = require("../schema/userPartialSchema");
 const { json } = require("express");
-const { SECRET_KEY } = require("../config");
-const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn } = require("../middleware/auth");
 const makeToken = require("../helpers/makeToken")
 
 const router = new express.Router();

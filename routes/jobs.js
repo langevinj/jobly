@@ -9,9 +9,8 @@ const jsonschema = require("jsonschema");
 //require JSON schema
 const jobSchema = require("../schema/jobSchema");
 const jobPartialSchema = require("../schema/jobPartialSchema");
-const { SECRET_KEY } = require("../config");
 
-const { authenticateJWT } = require("../middleware/auth");
+const { authenticateJWT, ensureAdmin } = require("../middleware/auth");
 
 const router = new express.Router();
 
@@ -57,7 +56,7 @@ router.get("/:id", authenticateJWT, async function (req, res, next) {
  *      {job: jobData}
  */
 
-router.post("/", async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) {
     const result = jsonschema.validate(req.body, jobSchema)
 
     if(!result.valid) {
@@ -80,7 +79,7 @@ router.post("/", async function (req, res, next) {
 *         {job: jobData}
 */
 
-router.patch("/:id", async function (req, res, next) {
+router.patch("/:id", ensureAdmin, async function (req, res, next) {
     const result = jsonschema.validate(req.body, jobPartialSchema)
 
     if (!result.valid) {
@@ -103,7 +102,7 @@ router.patch("/:id", async function (req, res, next) {
  *      {message: "Job deleted"}
 */
 
-router.delete("/:id", async function (req, res, next) {
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
     try {
         const response = await Job.remove(req.params.id);
 

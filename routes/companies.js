@@ -10,7 +10,7 @@ const companySchema = require("../schema/companySchema");
 const companyPartialSchema = require("../schema/companyPartialSchema");
 
 const { SECRET_KEY } = require("../config");
-const { authenticateJWT } = require("../middleware/auth");
+const { authenticateJWT, ensureAdmin } = require("../middleware/auth");
 
 const router = new express.Router();
 /** GET / return the handle and name for all company objects
@@ -54,7 +54,7 @@ router.get("/:handle", authenticateJWT, async function (req, res, next) {
  *      {company: {handle, name, num_employees, description, logo_url}}
  */
 
-router.post("/", async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) {
     const result = jsonschema.validate(req.body, companySchema)
 
     if(!result.valid){
@@ -71,7 +71,7 @@ router.post("/", async function (req, res, next) {
  *       {company: {handle, name, num_employees, description, logo_url}}
 */
 
-router.patch("/:handle", async function (req, res, next) {
+router.patch("/:handle", ensureAdmin, async function (req, res, next) {
     const result = jsonschema.validate(req.body, companyPartialSchema)
 
     if (!result.valid) {
@@ -92,7 +92,7 @@ router.patch("/:handle", async function (req, res, next) {
  *      {message: "Company deleted"}
 */
 
-router.delete("/:handle", async function (req, res, next) {
+router.delete("/:handle", ensureAdmin, async function (req, res, next) {
     try {
         const response = await Company.remove(req.params.handle);
         return res.json({message: response});

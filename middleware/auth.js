@@ -35,11 +35,25 @@ function ensureLoggedIn(req, res, next) {
 }
 
 function ensureAdmin(req, res, next) {
-    
+    try{
+        const tokenFromBody = req.body.token;
+
+        let token = jwt.verify(tokenFromBody, SECRET_KEY)
+        res.locals.username = token.username;
+        res.locals.is_admin = token.is_admin;
+
+        if(token.is_admin){
+            return next();
+        }
+        throw new Error();
+    } catch (err) {
+        return next(new ExpressError("Unauthorized, not an admin", 401));
+    }
 }
 
 
 module.exports = {
     authenticateJWT,
-    ensureLoggedIn
+    ensureLoggedIn,
+    ensureAdmin
 };
