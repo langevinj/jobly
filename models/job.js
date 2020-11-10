@@ -4,6 +4,9 @@ const db = require("../db");
 const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
+const { SECRET_KEY } = require("../config");
+const jwt = require("jsonwebtoken");
+
 class Job {
 
     /** create a new job      returns
@@ -126,6 +129,18 @@ class Job {
         }
 
         return "Job deleted"
+    }
+
+
+    /**Insert a new state into the applications table and return the new-state */
+    static async apply(id, data){
+        let info = jwt.decode(data.token)
+        const result = db.query(
+            `INSERT INTO applications (username, job_id, state)
+            VALUES($1, $2, $3) RETURNING state`, [info.username, id, data.state]
+        );
+
+        return result.rows[0]
     }
 
 

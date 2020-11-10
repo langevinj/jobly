@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "state": "pending",
+            "token": "mjdfhasjkluyjoqw948928yrnfwfe"
+        }
+    ],
+    "required": [
+        "state"
+    ],
+    "properties": {
+        "state": {
+            "$id": "#/properties/state",
+            "type": "string",
+            "title": "The state schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "pending"
+            ]
+        },
+        "token": {
+            "$id": "#/properties/token",
+            "type": "string",
+            "title": "The token schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "mjdfhasjkluyjoqw948928yrnfwfe"
+            ]
+        }
+    },
+    "additionalProperties": false
+}

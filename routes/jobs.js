@@ -9,8 +9,9 @@ const jsonschema = require("jsonschema");
 //require JSON schema
 const jobSchema = require("../schema/jobSchema");
 const jobPartialSchema = require("../schema/jobPartialSchema");
+const applicationStateSchema = require("../schema/applicationStateSchema");
 
-const { authenticateJWT, ensureAdmin } = require("../middleware/auth");
+const { authenticateJWT, ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
 
 const router = new express.Router();
 
@@ -72,6 +73,27 @@ router.post("/", ensureAdmin, async function (req, res, next) {
         return next(err);
     }
 });
+
+/** POST /:id/apply takes state of application and returns
+ *      {mesage: new-state}
+*/
+
+router.post("/:id/apply", ensureLoggedIn, async function(req, res, next) {
+    const result = jsonschema.validate(req.body, applicationStateSchema);
+
+    if (!result.valid) {
+        let listOfErrors = result.errors.map(err => err.stack)
+        let error = new ExpressError(listOfErrors, 400);
+        return next(error);
+    }
+
+    try{
+        const currentState = await Job.apply(req.params.id, req.body)
+        return res.json({message: currentState})
+    } catch (err) {
+        return next(err);
+    }
+})
 
 
 /** PATCH /[id]

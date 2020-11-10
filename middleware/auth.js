@@ -24,10 +24,11 @@ function ensureLoggedIn(req, res, next) {
 
         let token = jwt.verify(tokenFromBody, SECRET_KEY)
         res.locals.username = token.username;
-
+        
         if (token.username === req.params.username){
             return next();
         }
+        
         throw new Error();
     } catch (err) {
         return next(new ExpressError("Unauthorized", 401))
