@@ -80,6 +80,9 @@ class User{
       */
 
      static async update(username, data){
+         if(data.token){
+             delete data.token
+         }
          let response = sqlForPartialUpdate("users", data, "username", username);
 
          const result = await db.query(response.query, response.values);
