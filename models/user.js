@@ -86,6 +86,15 @@ class User{
 
           return "User deleted"
       }
+
+      //Get the hashed password to aid in authorization/authentication
+      static async getPwd(username){
+          const result = await db.query(
+              `SELECT pwd, is_admin FROM users WHERE username = $1`, [username]);
+            return result.rows[0]
+      }
+
+      
 }
 
 module.exports = User;
