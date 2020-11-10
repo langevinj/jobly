@@ -25,4 +25,10 @@ CREATE TABLE users (
     is_admin BOOLEAN NOT NULL DEFAULT false
 );
 
+CREATE TABLE applications (
+    username PRIMARY KEY REFERENCES users ON DELETE CASCADE,
+    job_id PRIMARY KEY REFERENCES jobs ON DELETE CASCADE,
+    state text NOT NULL,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP
+)
 
