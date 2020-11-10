@@ -5,10 +5,13 @@ const express = require("express");
 const User = require("../models/user");
 const ExpressError = require("../helpers/expressError");
 const jsonschema = require("jsonschema");
+const jwt = require("jsonwebtoken");
 
 const userSchema = require("../schema/userSchema");
 const userPartialSchema = require("../schema/userPartialSchema");
 const { json } = require("express");
+const { SECRET_KEY } = require("../config");
+const { ensureLoggedIn } = require("../middleware/auth");
 
 const router = new express.Router();
 
@@ -55,8 +58,8 @@ router.post("/", async function(req, res, next) {
 
     try{
         const user = await User.register(req.body);
-
-        return res.json({user: user})
+        let token = jwt.sign({ user }, SECRET_KEY);
+        return res.json({ token });
     } catch (err) {
         return next(err);
     }
@@ -88,7 +91,7 @@ router.patch("/:username", async function (req, res, next) {
  *      {message: "User deleted"}
  */
 
-router.delete("/:username", async function (req, res, next) {
+router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
     try {
         const response = await User.remove(req.params.username)
 

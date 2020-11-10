@@ -6,6 +6,33 @@ const bcrypt = require("bcrypt");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
 class User{
+    /* authenticate user with username, password. Returns user */
+    static async authenticate(data){
+
+        const result = await db.query(
+            `SELECT username,
+                    pwd,
+                    first_name,
+                    last_name,
+                    email,
+                    photo_url,
+                    is_admin
+                FROM users
+                WHERE username = $1`,
+                [data.username]
+        );
+
+        const user = result.rows[0];
+
+        if(user) {
+            const isValid = await bcrypt.compare(data.pwd, user.pwd)
+            if(isValid){
+                return user;
+            }
+        }
+
+        throw ExpressError("Invalid Password", 401)
+    }
 
     /** register a new user ------ returns
      *      {username, hashed_pwd, first_name, last_name}
@@ -17,7 +44,7 @@ class User{
         const result = await db.query(
             `INSERT INTO users (username, pwd, first_name, last_name, email, photo_url, is_admin)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING username`,
+            RETURNING username, is_admin`,
             [username, hashed_pwd, first_name, last_name, email, photo_url, is_admin]
         );
 
@@ -87,14 +114,6 @@ class User{
           return "User deleted"
       }
 
-      //Get the hashed password to aid in authorization/authentication
-      static async getPwd(username){
-          const result = await db.query(
-              `SELECT pwd, is_admin FROM users WHERE username = $1`, [username]);
-            return result.rows[0]
-      }
-
-      
 }
 
 module.exports = User;

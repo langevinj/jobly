@@ -9,6 +9,9 @@ const jsonschema = require("jsonschema");
 //require JSON schema
 const jobSchema = require("../schema/jobSchema");
 const jobPartialSchema = require("../schema/jobPartialSchema");
+const { SECRET_KEY } = require("../config");
+
+const { authenticateJWT } = require("../middleware/auth");
 
 const router = new express.Router();
 
@@ -18,10 +21,9 @@ const router = new express.Router();
  * allows for multiple optional query paraemters
  */
 
-router.get("/", async function (req, res, next) {
+router.get("/", authenticateJWT, async function (req, res, next) {
     try {
         let listOfJobs;
-
         //check if any parameters are present
         if (Object.keys(req.query).length === 0) {
             listOfJobs = await Job.all()
@@ -40,7 +42,7 @@ router.get("/", async function (req, res, next) {
  * 
  */
 
-router.get("/:id", async function (req, res, next) {
+router.get("/:id", authenticateJWT, async function (req, res, next) {
     try {
         const job = await Job.get(req.params.id)
 

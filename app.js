@@ -15,8 +15,6 @@ const authRoutes = require("./routes/auth");
 
 app.use(express.json());
 
-
-
 // add logging system
 app.use(morgan("tiny"));
 
