@@ -26,9 +26,10 @@ CREATE TABLE users (
 );
 
 CREATE TABLE applications (
-    username PRIMARY KEY REFERENCES users ON DELETE CASCADE,
-    job_id PRIMARY KEY REFERENCES jobs ON DELETE CASCADE,
+    username text NOT NULL REFERENCES users ON DELETE CASCADE,
+    job_id int NOT REFERENCES jobs ON DELETE CASCADE,
     state text NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 )
+
 
