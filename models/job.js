@@ -101,6 +101,9 @@ class Job {
     */
 
     static async update(id, data) {
+        if(data.token){
+            delete data.token
+        }
         let response = sqlForPartialUpdate("jobs", data, "id", id)
         const result = await db.query(response.query, response.values)
 
