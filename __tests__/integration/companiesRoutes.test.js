@@ -7,84 +7,58 @@
 process.env.NODE_ENV = "test";
 
 const request = require("supertest");
-const app = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/app.js");
-const db = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/db.js");
-const Company = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/models/company.js");
-const Job = require("/Users/JeremyLangevin/Springboard/Unit_37/express-jobly/models/job.js");
 
-describe("Company Routes Test", function () {
+const app = require('../../app');
 
-    // remove console.error from tests designed to fail, can be commented out as needed
-    beforeAll(() => {
-        jest.spyOn(console, 'error').mockImplementation(jest.fn());
-    })
+const {
+    TEST_DATA,
+    afterEachHook,
+    beforeEachHook,
+    afterAllHook
+} = require('./jest.config');
 
-    //clear out table and create sample data
-    beforeEach(async function() {
-        await db.query("DELETE FROM companies");
 
-        let c1 = await Company.create({
-            handle: "apple",
-            name: "Apple",
-            num_employees: 4000,
-            description: "Tech and computers",
-            logo_url: "www.apple.com"
+beforeEach(async function() {
+    await beforeEachHook(TEST_DATA);
+});
+
+// remove console.error from tests designed to fail, can be commented out as needed
+beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(jest.fn());
+})
+
+describe("GET /companies", function () {
+    test("can get a list containing 1 company", async function () {
+        const response = await request(app).get('/companies')
+            .send({
+                token: TEST_DATA.userToken
+            });
+        console.log(response.body.companies)
+        expect(response.body.companies).toHaveLength(1);
+        expect(response.body.companies[0]).toHaveProperty('handle');
+    });
+
+    test("can get a filtered list of companies by a searched name", async function(){
+        let response = await request(app)
+            .get("/companies?search=apple")
+            .send({
+                token: TEST_DATA.userToken
+            });
+            
+        expect(response.body).toEqual({
+            "companies": [{
+                "handle": "apple",
+                "name": "Apple"
+            }]
         });
     });
 
-    //add a second company when needed for testing
-    async function addSecondCompany(){
-        let c2 = await Company.create({
-            handle: "ibm",
-            name: "IBM",
-            num_employees: 1000,
-            description: "IT services",
-            logo_url: "https://www.ibm.com"
-        });
-    }
-
-    //add a job if needed for test
-    async function addJob(){
-        let j1 = await Job.create({
-            title: "Customer Service",
-            salary: 40000,
-            equity: 0.5,
-            company_handle: "apple"
-        });
-    }
-
-    /** GET /companies => [{handle, name}, ...] */
-    describe("GET /", function () {
-        test("can get a list containing 1 company", async function () {
-            let response = await request(app)
-                .get("/companies")
-
-            expect(response.body).toEqual({
-                "companies": [{
-                    "handle": "apple",
-                    "name": "Apple"
-                }]
-            });
-        });
-
-        test("can get a filtered list of companies by a searched name", async function(){
-            let ibm = await addSecondCompany();
-            console.log(`IBM: ${ibm}`)
-            let response = await request(app)
-                .get("/companies?search=apple")
-            
-            expect(response.body).toEqual({
-                "companies": [{
-                    "handle": "apple",
-                    "name": "Apple"
-                }]
-            });
-        });
-
         test("can get a filter list of companies by min_employees", async function() {
-            await addSecondCompany();
             let response = await request(app)
                 .get("/companies?min_employees=2000")
+                .send({
+                    token: TEST_DATA.userToken
+                });
 
             expect(response.body).toEqual({
                 "companies": [{
@@ -95,177 +69,159 @@ describe("Company Routes Test", function () {
         });
 
         test("can get a filter list of companies by max_employees", async function () {
-            await addSecondCompany();
             let response = await request(app)
-                .get("/companies?max_employees=2000")
+                .get("/companies?max_employees=7000")
+                .send({
+                    token: TEST_DATA.userToken
+                });
 
-            expect(response.body).toEqual({
-                "companies": [{
-                    "handle": "ibm",
-                    "name": "IBM"
-                }]
-            });
+            expect(response.body.companies).toHaveLength(1);
+            expect(response.body.companies[0].handle).toEqual("apple");
         });
 
         test("can filter companies by multiple parameters", async function() {
-            await addSecondCompany();
             let response = await request(app)
                 .get("/companies?search=apple&min_employees=1500&max_employees=9000")
+                .send({
+                    token: TEST_DATA.userToken
+                });
 
-            expect(response.body).toEqual({
-                "companies": [{
-                    "handle": "apple",
-                    "name": "Apple"
-                }]
-            });
+                expect(response.body.companies).toHaveLength(1);
+                expect(response.body.companies[0].name).toEqual("Apple");
         });
 
         test("400 error if min_employees is higher than max_employees", async function(){
             let response = await request(app)
                 .get("/companies?min_employees=6000&max_employees=5000")
+                .send({
+                    token: TEST_DATA.userToken
+                });
 
             expect(response.statusCode).toEqual(400)
         });
-    });
+});
 
-    /** GET /:handle =>  {company: {handle, name, num_employees, description, logo_url}}*/
 
-    describe("GET /:handle", function (){
-        test("gets a company given its handle", async function() {
-            await addJob();
-            let response = await request(app)
-                .get("/companies/apple")
-            console.log(response.body)
-            expect(response.body).toEqual({
-                "company": {
-                    "handle": "apple",
-                    "name": "Apple",
-                    "num_employees": 4000,
-                    "description": "Tech and computers",
-                    "logo_url": "www.apple.com",
-                    "jobs": expect.any(Array)
-                }
+describe("GET /:handle", function (){
+    test("gets a company given its handle", async function() {
+        let response = await request(app)
+            .get("/companies/apple")
+            .send({
+                token: TEST_DATA.userToken
             });
-        });
-
-        test("404 if no company with the given handle", async function(){ 
-            let response = await request(app)
-                .get("/companies/ibm")
-
-            expect(response.statusCode).toEqual(404)
-        });
+        expect(response.body.company).toHaveProperty('handle');
+        expect(response.body.company.handle).toBe('apple');
     });
+
+    test("404 if no company with the given handle", async function(){ 
+        let response = await request(app)
+            .get("/companies/ibm")
+            .send({
+                token: TEST_DATA.userToken
+            });
+
+        expect(response.statusCode).toEqual(404)
+    });
+});
 
     /** POST / creates a new company => {company: {handle, name, num_employees, description, logo_url}}
     */
 
-    describe("POST /", function(){
-        test("creates a new company given valid parameters", async function(){
-            let response = await request(app)
-                .post("/companies")
-                .send({
-                    handle: "ibm",
-                    name: "IBM",
-                    num_employees: 1000,
-                    description: "IT services",
-                    logo_url: "https://www.ibm.com"
-                })
-            
-            expect(response.body).toEqual({
-                "company":{
-                    "handle": "ibm",
-                    "name": "IBM",
-                    "num_employees": 1000,
-                    "description": "IT services",
-                    "logo_url": "https://www.ibm.com"}
+describe("POST /companies", function(){
+    test("creates a new company given valid parameters", async function(){
+        let response = await request(app)
+            .post("/companies")
+            .send({
+                handle: "ibm",
+                name: "IBM",
+                num_employees: 1000,
+                description: "IT services",
+                logo_url: "https://www.ibm.com",
+                token: TEST_DATA.userToken
             })
-        });
-
-        test("400 if parameters are not valid", async () => {
-            let response = await request(app).post("/companies")
-                .send({
-                    handle: "ibm",
-                    name: "IBM",
-                    num_employees: 1000,
-                    description: "IT services",
-                    logo_url: "asdfghjkl"
-                });
-            
-            expect(response.statusCode).toEqual(400)
-        });
+        
+        expect(response.body).toEqual({
+            "company":{
+                "handle": "ibm",
+                "name": "IBM",
+                "num_employees": 1000,
+                "description": "IT services",
+                "logo_url": "https://www.ibm.com"}
+        })
     });
-
-    /** PATCH /:handle updates an existing company =>
-     *      {company: {handle, name, num_employees, description, logo_url}}
-     */
-
-    describe("PATCH /:handle", function () {
-        test("updates an existing company", async function(){
-            let response = await request(app).patch("/companies/apple")
-                .send({
-                    name: "Macintosh",
-                    num_employees: 10000
-                });
-
-            expect(response.body).toEqual({
-                "company": {
-                    "handle": "apple",
-                    "name": "Macintosh",
-                    "num_employees": 10000,
-                    "description": "Tech and computers",
-                    "logo_url": "www.apple.com"
-                }
+    test("400 if parameters are not valid", async () => {
+        let response = await request(app).post("/companies")
+            .send({
+                handle: "ibm",
+                name: "IBM",
+                num_employees: 1000,
+                description: "IT services",
+                logo_url: "asdfghjkl",
+                token: TEST_DATA.userToken
             });
-
-            let result = await Company.all()
-
-            //check that the already existing company was changed
-            expect(result.length).toEqual(1)
-        });
-
-        test("400 if parameters passed are not valid", async function(){
-            let response = await request(app).patch("/companies/apple")
-                .send({
-                    num_employees: "10000",
-                    language: "english"
-                });
-            expect(response.statusCode).toEqual(400)
-        });
-
-        test("404 if no company with given handle", async function () {
-            response = await request(app).patch("/companies/asdfghjkl")
-                .send({
-                    name: "Macintosh",
-                    num_employees: 10000
-                });
-
-            expect(response.statusCode).toEqual(404)
-        }); 
+        
+        expect(response.statusCode).toEqual(400)
     });
+});
 
-    /** DELETE /:handle remove a company =>
-     *      {message: "Company deleted"}
-     */
 
-    describe("DELETE /:handle", function() {
-        test("delete a company given a handle", async function(){
-            let response = await request(app).delete("/companies/apple")
-
-            expect(response.body).toEqual({
-                "message": "Company deleted"
+describe("PATCH /companies/:handle", function () {
+    test("updates an existing company", async function(){
+        let response = await request(app).patch("/companies/apple")
+            .send({
+                name: "Macintosh",
+                num_employees: 10000,
+                token: TEST_DATA.userToken
             });
-
-            let result = await Company.all()
-
-            //Check that the company was actually deleted
-            expect(result.length).toEqual(0)
+        expect(response.body).toEqual({
+            "company": {
+                "handle": "apple",
+                "name": "Macintosh",
+                "num_employees": 10000,
+                "description": "Tech and computers",
+                "logo_url": "www.apple.com"
+            }
         });
-
-        test("404 if no company with given handle", async function() {
-            let response = await request(app).delete("/companies/ibm")
-
-            expect(response.statusCode).toEqual(404)
-        }); 
     });
+    test("400 if parameters passed are not valid", async function(){
+        let response = await request(app).patch("/companies/apple")
+            .send({
+                num_employees: "10000",
+                language: "english",
+                token: TEST_DATA.userToken
+            });
+        expect(response.statusCode).toEqual(400)
+    });
+    test("404 if no company with given handle", async function () {
+        response = await request(app).patch("/companies/asdfghjkl")
+            .send({
+                name: "Macintosh",
+                num_employees: 10000,
+                token: TEST_DATA.userToken
+            });
+        expect(response.statusCode).toEqual(404)
+    }); 
+});
 
+
+describe("DELETE /companies/:handle", function() {
+    test("delete a company given a handle", async function(){
+        let response = await request(app).delete("/companies/apple").send({token: TEST_DATA.userToken})
+        expect(response.body).toEqual({
+            "message": "Company deleted",
+        });
+    });
+    test("404 if no company with given handle", async function() {
+        let response = await request(app).delete("/companies/ibm").send({ token: TEST_DATA.userToken })
+        expect(response.statusCode).toEqual(404)
+    }); 
+});
+
+
+afterEach(async function() {
+    await afterEachHook();
+});
+
+afterAll(async function() {
+    await afterAllHook();
 });

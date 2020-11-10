@@ -18,9 +18,9 @@ const TEST_DATA = {};
 async function beforeEachHook(TEST_DATA){
     try{
         //login a user, get a token, store the user ID and token
-        const hashedPassword = await bcrypt.hash("secret", 1);
+        const hashedPassword = await bcrypt.hash('secret', 1);
         await db.query(
-            `INSERT INTO users (username, password, first_name, last_name, email, is_admin)
+            `INSERT INTO users (username, pwd, first_name, last_name, email, is_admin)
             VALUES ('testuser', $1, 'Test', 'Testy', 'test@test.com', true)`,
             [hashedPassword]
         );
@@ -29,7 +29,7 @@ async function beforeEachHook(TEST_DATA){
             .post('/login')
             .send({
                 username: 'testuser',
-                password: 'secret'
+                pwd: 'secret'
             });
 
         TEST_DATA.userToken = response.body.token;

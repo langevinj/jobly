@@ -102,6 +102,9 @@ class Company {
    * {handle, name, num_employees, description, logo_url}
    */
   static async update(handle, data){
+      if(data.token){
+          delete data.token
+      }
       let response = sqlForPartialUpdate("companies", data, "handle", handle)
       const result = await db.query(response.query, response.values)
 

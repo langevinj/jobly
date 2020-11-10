@@ -77,6 +77,15 @@
             "examples": [
                 "www.photo.com"
             ]
+        },
+        "token": {
+            "$id": "/properties/token",
+            "type": "string",
+            "title": "The Token Schema ",
+            "default": "",
+            "examples": [
+                "foo123"
+            ]
         }
     },
     "additionalProperties": false
