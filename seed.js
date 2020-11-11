@@ -38,3 +38,9 @@ User.register({
     email: "testuser@test.com",
     is_admin: true
 });
+
+db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Bootstrap']);
+db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['JavaScript']);
+db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Management']);
+db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Marketing experience']);
+db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Python']);

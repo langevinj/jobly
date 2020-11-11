@@ -6,12 +6,18 @@ CREATE TABLE companies (
     logo_url text
 );
 
+CREATE TABLE technologies (
+    tech_id SERIAL PRIMARY KEY,
+    tech_name text NOT NULL UNIQUE
+);
+
 CREATE TABLE jobs (
     id SERIAL PRIMARY KEY,
     title text NOT NULL,
     salary float NOT NULL,
     equity float NOT NULL CHECK (equity <= 1.0),
     company_handle text REFERENCES companies ON DELETE CASCADE,
+    requirements int REFERENCES technologies ON DELETE CASCADE,
     date_posted timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -30,6 +36,5 @@ CREATE TABLE applications (
     job_id int NOT NULL REFERENCES jobs ON DELETE CASCADE,
     state text NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
-)
-
+);
 
