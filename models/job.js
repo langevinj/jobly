@@ -22,8 +22,15 @@ class Job {
                 company_handle,
                 requirements)
             VALUES ($1, $2, $3, $4, $5)
-            RETURNING title, salary, equity, company_handle, requirements, date_posted`,
+            RETURNING id, title, salary, equity, company_handle, requirements, date_posted`,
             [title, salary, equity, company_handle, requirements]);
+        
+        if(requirements !== ""){
+            const arrayOfRequirements = await listRequirements(result.rows[0].id);
+            result.rows[0].requirements = arrayOfRequirements;
+        }
+        
+
         return result.rows[0]
     }
 

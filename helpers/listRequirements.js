@@ -18,7 +18,12 @@ async function listRequirements(job_id){
             requirementNames.push(tempRequirement.rows[0].tech_name);
         }
     }
-    return requirementNames;
+    if(requirementNames === []){
+        return "No requirements listed"
+    } else {
+        return requirementNames;
+    }
+
 }
 
 module.exports = listRequirements;
