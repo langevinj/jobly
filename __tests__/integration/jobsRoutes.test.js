@@ -68,10 +68,8 @@ describe("GET /jobs", async function () {
 
 describe("GET /jobs/:id", async function(){
     test("can get a job by its id", async function(){
-        //Get the correct id for the param
-        // let result = await db.query('SELECT id FROM jobs LIMIT 1')
-        // let id = result.rows[0].id
         let response = await request(app).get(`/jobs/${TEST_DATA.jobId}`).send({ token: TEST_DATA.userToken })
+        console.log(response.body)
         expect(response.body.job).toHaveProperty('equity')
         expect(response.body).toEqual({"job": {
             "title": "Customer Service",
@@ -84,6 +82,7 @@ describe("GET /jobs/:id", async function(){
                 "description": "Tech and computers",
                 "logo_url": "www.apple.com"
             },
+            "requirements": [],
             "date_posted": expect.any(String)
         }});
     });

@@ -90,7 +90,7 @@ class Job {
         
         //if there are requiremnets listed, grab each of them from the technologies table
         let requirementNames = [];
-        if(requirements.rows.length !== 0){
+        if(requirements.rows[0].requirements !== null){
             let requirementsArray = requirements.rows[0].requirements.split(',');
             for(let i=0; i<requirementsArray.length; i++){
                 let tempRequirement = await db.query(
