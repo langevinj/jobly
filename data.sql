@@ -31,10 +31,12 @@ CREATE TABLE users (
     is_admin BOOLEAN NOT NULL DEFAULT false
 );
 
+CREATE TYPE state AS ENUM ('interested', 'applied', 'accepted', 'rejected');
+
 CREATE TABLE applications (
     username text NOT NULL REFERENCES users ON DELETE CASCADE,
     job_id int NOT NULL REFERENCES jobs ON DELETE CASCADE,
-    state text NOT NULL,
+    state state NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 

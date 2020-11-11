@@ -4,10 +4,11 @@ const User = require("./models/user")
 const db = require("./db");
 const { JsonWebTokenError } = require("jsonwebtoken");
 
-db.query('DELETE FROM companies');
-db.query('DELETE FROM jobs');
+async function seedDb(){
+await db.query('DELETE FROM companies');
+await db.query('DELETE FROM jobs');
 
-Company.create({
+await Company.create({
     handle: "apple",
     name: "Apple",
     num_employees: 4000,
@@ -15,7 +16,7 @@ Company.create({
     logo_url: "www.apple.com"
 });
 
-Company.create({
+await Company.create({
     handle: "ibm",
     name: "IBM",
     num_employees: 1000,
@@ -23,14 +24,14 @@ Company.create({
     logo_url: "www.ibm.com"
 });
 
-Job.create({
+await Job.create({
     title: "Genius",
     salary: 70000.00,
     equity: 0.5,
     company_handle: "apple"
 });
 
-User.register({
+await User.register({
     username: "testuser",
     pwd: "abc123",
     first_name: "Test",
@@ -39,11 +40,18 @@ User.register({
     is_admin: true
 });
 
-db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Bootstrap']);
-db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['JavaScript']);
-db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Management']);
-db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Marketing experience']);
-db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Python']);
+await db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Bootstrap']);
+await db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['JavaScript']);
+await db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Management']);
+await db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Marketing experience']);
+await db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Python']);
 
-db.query(`INSERT INTO jobs (title, salary, equity, requirements, company_handle)
+await db.query(`INSERT INTO jobs (title, salary, equity, requirements, company_handle)
             VALUES ('UX Engineer', 65000, 0.5, '1,2,3', 'apple')`);
+
+await db.query(`INSERT INTO applications (username, job_id, state)
+        VALUES ($1, $2, $3)`, ['testuser', 1, 'applied'])
+
+}
+
+seedDb();
