@@ -134,8 +134,9 @@ class Job {
 
     /**Insert a new state into the applications table and return the new-state */
     static async apply(id, data){
-        let info = jwt.decode(data.token)
-        const result = db.query(
+        let info = jwt.decode(data.token);
+
+        const result = await db.query(
             `INSERT INTO applications (username, job_id, state)
             VALUES($1, $2, $3) RETURNING state`, [info.username, id, data.state]
         );

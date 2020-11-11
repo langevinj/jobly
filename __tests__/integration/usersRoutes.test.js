@@ -55,6 +55,7 @@ describe("GET /users/:username", function() {
                 "username": "testuser",
                 "first_name": "Test",
                 "last_name": "Testy",
+                "jobs": [],
                 "email": "test@test.com",
                 "photo_url": null
             }

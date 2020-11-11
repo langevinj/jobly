@@ -91,7 +91,7 @@ class User{
         let allJobs = jobs.rows
         let arrayOfJobs = []
         
-        if(jobs.rows[0]){
+        if(jobs.rows.length !== 0){
             for (let i = 0; i < allJobs.length; i++) {
                 let tempJob = {
                     title: allJobs[i].title,
