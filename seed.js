@@ -44,3 +44,6 @@ db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['JavaScript']);
 db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Management']);
 db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Marketing experience']);
 db.query(`INSERT INTO technologies (tech_name) VALUES ($1)`, ['Python']);
+
+db.query(`INSERT INTO jobs (title, salary, equity, requirements, company_handle)
+            VALUES ('UX Engineer', 65000, 0.5, '1,2,3', 'apple')`);

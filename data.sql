@@ -17,7 +17,7 @@ CREATE TABLE jobs (
     salary float NOT NULL,
     equity float NOT NULL CHECK (equity <= 1.0),
     company_handle text REFERENCES companies ON DELETE CASCADE,
-    requirements int REFERENCES technologies ON DELETE CASCADE,
+    requirements text,
     date_posted timestamp DEFAULT CURRENT_TIMESTAMP
 );
 

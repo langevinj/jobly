@@ -83,6 +83,24 @@ class Job {
 
         let data = result.rows[0]
 
+        //Check if the job has listed requirements, and get the array of them if it does
+        const requirements = await db.query(
+            `SELECT requirements FROM jobs WHERE id = $1`, [id]
+        );
+        
+        //if there are requiremnets listed, grab each of them from the technologies table
+        let requirementNames = [];
+        if(requirements.rows.length !== 0){
+            let requirementsArray = requirements.rows[0].requirements.split(',');
+            for(let i=0; i<requirementsArray.length; i++){
+                let tempRequirement = await db.query(
+                       `SELECT tech_name FROM technologies
+                       WHERE tech_id = $1`, [parseInt(requirementsArray[i])] 
+                    );
+                requirementNames.push(tempRequirement.rows[0].tech_name);
+            }
+        }
+
         return {
             "title": data.title,
             "salary": data.salary,
@@ -94,6 +112,7 @@ class Job {
                 "description": data.description,
                 "logo_url": data.logo_url
             },
+            "requirements": requirementNames,
             "date_posted": data.date_posted
         }
     }
