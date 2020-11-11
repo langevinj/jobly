@@ -53,6 +53,13 @@ async function beforeEachHook(TEST_DATA){
         );
 
         TEST_DATA.jobId = newJob.rows[0].id;
+        
+        const newJobApp = await db.query(
+            'INSERT INTO applications (username, job_id) VALUES ($1, $2) RETURNING *',
+            [TEST_DATA.currentUsername, TEST_DATA.jobId]
+        );
+
+        TEST_DATA.jobApp = newJobApp.rows[0];
 
     } catch (error) {
         console.error(error);
@@ -61,6 +68,7 @@ async function beforeEachHook(TEST_DATA){
 
 async function afterEachHook() {
     try{
+        await db.query('DELETE FROM applications');
         await db.query('DELETE FROM jobs');
         await db.query('DELETE FROM users');
         await db.query('DELETE FROM companies');

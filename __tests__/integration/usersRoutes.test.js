@@ -49,17 +49,9 @@ describe("GET /users", async function () {
 describe("GET /users/:username", function() {
     test("can get a user given their username", async function () {
         let response = await request(app).get("/users/testuser").send({ token: TEST_DATA.userToken })
-
-        expect(response.body).toEqual({
-            "user": {
-                "username": "testuser",
-                "first_name": "Test",
-                "last_name": "Testy",
-                "jobs": [],
-                "email": "test@test.com",
-                "photo_url": null
-            }
-        });
+        console.log(response.body)
+        expect(response.body.user).toHaveProperty("jobs")
+        expect(response.body.user.jobs[0]).toHaveProperty("application")
     });
 
     test("404 if user with the given username doesn't exist", async function(){
