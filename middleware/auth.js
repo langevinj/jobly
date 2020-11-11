@@ -25,7 +25,6 @@ function ensureLoggedIn(req, res, next) {
         let token = jwt.verify(tokenFromBody, SECRET_KEY)
 
         res.locals.username = token.username;
-        console.log(req.params)
 
         if(req.params.username){
             if (token.username === req.params.username) {

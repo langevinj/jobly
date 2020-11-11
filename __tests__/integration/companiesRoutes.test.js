@@ -33,7 +33,7 @@ describe("GET /companies", function () {
             .send({
                 token: TEST_DATA.userToken
             });
-        console.log(response.body.companies)
+        
         expect(response.body.companies).toHaveLength(1);
         expect(response.body.companies[0]).toHaveProperty('handle');
     });

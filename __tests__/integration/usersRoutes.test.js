@@ -49,7 +49,7 @@ describe("GET /users", async function () {
 describe("GET /users/:username", function() {
     test("can get a user given their username", async function () {
         let response = await request(app).get("/users/testuser").send({ token: TEST_DATA.userToken })
-        console.log(response.body)
+       
         expect(response.body.user).toHaveProperty("jobs")
         expect(response.body.user.jobs[0]).toHaveProperty("application")
     });
