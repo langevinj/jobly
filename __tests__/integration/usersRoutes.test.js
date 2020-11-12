@@ -31,7 +31,7 @@ beforeAll(() => {
 
     /** GET /users => {users: [{username, first_name, last_name, email}, ...]} */
 
-describe("GET /users", async function () {
+describe("GET /users", function () {
     test("can get a list containing one user", async function() {
         let response = await request(app).get("/users").send({token: TEST_DATA.userToken})
         expect(response.body).toEqual({
