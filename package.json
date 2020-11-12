@@ -8,7 +8,7 @@
     "start": "node server.js"
   },
   "jest": {
-    "testPathIgnorePatters": [
+    "testPathIgnorePatterns": [
       "/node_modules/",
       "jest.config.js"
     ]
