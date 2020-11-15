@@ -22,20 +22,19 @@ router.get('/', authenticateJWT, async function (req, res, next) {
 
         //check if any parameters are present
         if(Object.keys(req.query).length === 0){
-            listOfCompanies = await Company.all()
+            listOfCompanies = await Company.all();
         } else {
             listOfCompanies = await Company.all(req.query);
         }
 
         //throw error if min_employees is larger than max_employees
         if(!listOfCompanies){
-            throw new ExpressError("Invalid Parameters", 400)
+            throw new ExpressError("Invalid Parameters", 400);
         }
 
-        return res.json({ companies: listOfCompanies })  
+        return res.json({ companies: listOfCompanies });
     } catch (err) {
-
-        return next(err)
+        return next(err);
     }
 });
 
@@ -102,10 +101,5 @@ router.delete("/:handle", ensureAdmin, async function (req, res, next) {
         return next(err);
     } 
 });
-
-
-
-
-
 
 module.exports = router;
