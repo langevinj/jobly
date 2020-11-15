@@ -3,8 +3,6 @@
 const express = require("express");
 
 const Job = require("../models/job");
-const ExpressError = require("../helpers/expressError");
-const jsonschema = require("jsonschema");
 
 //require JSON schema
 const jobSchema = require("../schema/jobSchema");
@@ -12,6 +10,7 @@ const jobPartialSchema = require("../schema/jobPartialSchema");
 const applicationStateSchema = require("../schema/applicationStateSchema");
 
 const { authenticateJWT, ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
+const validateSchema = require("../helpers/validateSchema");
 
 const router = new express.Router();
 
@@ -58,15 +57,8 @@ router.get("/:id", authenticateJWT, async function (req, res, next) {
  */
 
 router.post("/", ensureAdmin, async function (req, res, next) {
-    const result = jsonschema.validate(req.body, jobSchema)
-
-    if(!result.valid) {
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
-    }
-
     try{
+        validateSchema(req, jobSchema)
         const job = await Job.create(req.body);
         return res.json({ job : job });
     } catch (err) {
@@ -79,21 +71,14 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 */
 
 router.post("/:id/apply", ensureLoggedIn, async function(req, res, next) {
-    const result = jsonschema.validate(req.body, applicationStateSchema);
-
-    if (!result.valid) {
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
-    }
-
     try{
+        validateSchema(req, applicationStateSchema);
         const currentState = await Job.apply(req.params.id, req.body)
         return res.json({message: currentState})
     } catch (err) {
         return next(err);
     }
-})
+});
 
 
 /** PATCH /[id]
@@ -102,15 +87,8 @@ router.post("/:id/apply", ensureLoggedIn, async function(req, res, next) {
 */
 
 router.patch("/:id", ensureAdmin, async function (req, res, next) {
-    const result = jsonschema.validate(req.body, jobPartialSchema)
-
-    if (!result.valid) {
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
-    }
-
     try {
+        validateSchema(req, jobPartialSchema);
         const job = await Job.update(req.params.id, req.body);
 
         return res.json({ job: job });

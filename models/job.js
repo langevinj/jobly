@@ -46,7 +46,7 @@ class Job {
             const result = await db.query(`SELECT title, company_handle FROM jobs`);
             return result.rows;
         } else {
-            let columns = [];
+            const columns = [];
             if ('search' in parameters) {
                 columns.push(`title ILIKE '%${parameters['search']}%'`)
             }
@@ -60,7 +60,7 @@ class Job {
             }
 
             //construct query with parameters
-            let cols = columns.join(' AND ');
+            const cols = columns.join(' AND ');
             const result = await db.query(`SELECT title, company_handle FROM jobs
                         WHERE ${cols}`)
             return result.rows
@@ -90,8 +90,8 @@ class Job {
             throw new ExpressError(`No such job with id: ${id}`, 404);
         }
 
-        let data = result.rows[0]
-        let arrayOfRequirements = await listRequirements(id);
+        const data = result.rows[0]
+        const arrayOfRequirements = await listRequirements(id);
 
         return {
             "title": data.title,
@@ -118,7 +118,7 @@ class Job {
         if(data.token){
             delete data.token
         }
-        let response = sqlForPartialUpdate("jobs", data, "id", id)
+        const response = sqlForPartialUpdate("jobs", data, "id", id)
         const result = await db.query(response.query, response.values)
 
         if (!result.rows[0]) {
@@ -145,7 +145,7 @@ class Job {
 
     /**Insert a new state into the applications table and return the new-state */
     static async apply(id, data){
-        let info = jwt.decode(data.token);
+        const info = jwt.decode(data.token);
 
         const result = await db.query(
             `INSERT INTO applications (username, job_id, state)
