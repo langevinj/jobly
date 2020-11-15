@@ -7,6 +7,7 @@ const Job = require("../models/job");
 //require JSON schema
 const jobSchema = require("../schema/jobSchema");
 const jobPartialSchema = require("../schema/jobPartialSchema");
+const ExpressError = require("../helpers/expressError");
 const applicationStateSchema = require("../schema/applicationStateSchema");
 
 const { authenticateJWT, ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
@@ -44,7 +45,9 @@ router.get("/", authenticateJWT, async function (req, res, next) {
 router.get("/:id", authenticateJWT, async function (req, res, next) {
     try {
         const job = await Job.get(req.params.id)
-
+        if(!job){
+            throw new ExpressError(`No such job with id: ${req.params.id}`, 404); 
+        }
         return res.json({ job: job })
     } catch (err) {
         return next(err)
@@ -90,7 +93,9 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
     try {
         validateSchema(req, jobPartialSchema);
         const job = await Job.update(req.params.id, req.body);
-
+        if(!job){
+            throw new ExpressError(`No such job with id: ${req.params.id}`, 404);
+        }
         return res.json({ job: job });
     } catch (err) {
         return next(err)
@@ -105,7 +110,9 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
 router.delete("/:id", ensureAdmin, async function (req, res, next) {
     try {
         const response = await Job.remove(req.params.id);
-
+        if(!response){
+            throw new ExpressError(`No such job with id: ${req.params.id}`, 404); 
+        }
         return res.json({ message: response });
     } catch (err) {
         return next(err)

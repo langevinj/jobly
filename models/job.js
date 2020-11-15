@@ -85,9 +85,10 @@ class Job {
             FROM jobs
             JOIN companies ON jobs.company_handle = companies.handle
             WHERE id = $1`, [id]);
-
+        
+        //indicate no job with this id found
         if (!result.rows[0]) {
-            throw new ExpressError(`No such job with id: ${id}`, 404);
+            return null
         }
 
         const data = result.rows[0]
@@ -121,8 +122,9 @@ class Job {
         const response = sqlForPartialUpdate("jobs", data, "id", id)
         const result = await db.query(response.query, response.values)
 
+        //indicate no job with this id found
         if (!result.rows[0]) {
-            throw new ExpressError(`No such job with id: ${id}`, 404);
+            return null
         }
 
         return result.rows[0]
@@ -134,9 +136,10 @@ class Job {
         const result = await db.query(
             `DELETE FROM jobs WHERE id = $1
             RETURNING id`, [id]);
-
+        
+        //indicate no job with this id found
         if (!result.rows[0]) {
-            throw new ExpressError(`No such job with id: ${id}`, 404);
+            return null
         }
 
         return "Job deleted"
