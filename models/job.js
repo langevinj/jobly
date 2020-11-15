@@ -1,7 +1,6 @@
 //Model for the Job class
 
 const db = require("../db");
-const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
 const { SECRET_KEY } = require("../config");

@@ -11,6 +11,7 @@ const { json } = require("express");
 const { ensureLoggedIn } = require("../middleware/auth");
 const makeToken = require("../helpers/makeToken");
 const validateSchema = require("../helpers/validateSchema");
+const ExpressError = require("../helpers/expressError");
 
 const router = new express.Router();
 
@@ -34,7 +35,9 @@ router.get("/", async function (req, res, next) {
 router.get("/:username", async function (req, res, next) {
     try {
         const user = await User.get(req.params.username);
-
+        if(!user){
+            throw new ExpressError(`No such user with username: ${req.params.username}`, 404);
+        }
         return res.json({ user: user });
     } catch (err) {
         return next(err);
@@ -65,7 +68,9 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
     try {
         validateSchema(req, userPartialSchema);
         const user = await User.update(req.params.username, req.body);
-
+        if(!user){
+            throw new ExpressError(`No such user with username: ${req.params.username}`, 404);
+        }
         return res.json({ user: user });
     } catch (err) {
         return next(err);
@@ -79,7 +84,9 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
 router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
     try {
         const response = await User.remove(req.params.username)
-
+        if (!response) { 
+            throw new ExpressError(`No such user with username: ${req.params.username}`, 404);
+    }
         return res.json({ message: response });
     } catch (err) {
         return next(err);

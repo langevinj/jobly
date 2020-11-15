@@ -30,8 +30,8 @@ class User{
                 return user;
             }
         }
-
-        throw ExpressError("Invalid Password", 401)
+        //indicate an error in logging in
+        return null
     }
 
     /** register a new user ------ returns
@@ -68,9 +68,9 @@ class User{
                 FROM users
                 WHERE username = $1`,
                 [username]);
-
+        //indicate no user found with that username
         if (!result.rows[0]) {
-            throw new ExpressError(`No such user with username: ${username}`,404);
+            return null
         }
         const jobs = await db.query(
             `SELECT title,
@@ -124,9 +124,9 @@ class User{
          let response = sqlForPartialUpdate("users", data, "username", username);
 
          const result = await db.query(response.query, response.values);
-
+         //indicate no user found with given username
          if (!result.rows[0]) {
-             throw new ExpressError(`No such user with username: ${username}`, 404);
+             return null
          }
 
          let user = result.rows[0];
@@ -147,9 +147,9 @@ class User{
             `DELETE FROM users WHERE username = $1
             RETURNING username`,
             [username]);
-            
+          //indicate no user for with given username
           if (!result.rows[0]) {
-              throw new ExpressError(`No such user with username: ${username}`, 404);
+              return null
           }
 
           return "User deleted"
