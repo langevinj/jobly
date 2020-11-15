@@ -26,14 +26,13 @@ router.get("/", authenticateJWT, async function (req, res, next) {
         let listOfJobs;
         //check if any parameters are present
         if (Object.keys(req.query).length === 0) {
-            listOfJobs = await Job.all()
+            listOfJobs = await Job.all();
         } else {
             listOfJobs = await Job.all(req.query);
         }
-
-        return res.json({ jobs: listOfJobs})
+        return res.json({ jobs: listOfJobs});
     } catch (err) {
-        return next(err)
+        return next(err);
   }
 });
 
@@ -44,13 +43,13 @@ router.get("/", authenticateJWT, async function (req, res, next) {
 
 router.get("/:id", authenticateJWT, async function (req, res, next) {
     try {
-        const job = await Job.get(req.params.id)
+        const job = await Job.get(req.params.id);
         if(!job){
             throw new ExpressError(`No such job with id: ${req.params.id}`, 404); 
         }
-        return res.json({ job: job })
+        return res.json({ job: job });
     } catch (err) {
-        return next(err)
+        return next(err);
     }
 });
 
@@ -61,7 +60,7 @@ router.get("/:id", authenticateJWT, async function (req, res, next) {
 
 router.post("/", ensureAdmin, async function (req, res, next) {
     try{
-        validateSchema(req, jobSchema)
+        validateSchema(req, jobSchema);
         const job = await Job.create(req.body);
         return res.json({ job : job });
     } catch (err) {
@@ -76,8 +75,8 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 router.post("/:id/apply", ensureLoggedIn, async function(req, res, next) {
     try{
         validateSchema(req, applicationStateSchema);
-        const currentState = await Job.apply(req.params.id, req.body)
-        return res.json({message: currentState})
+        const currentState = await Job.apply(req.params.id, req.body);
+        return res.json({message: currentState});
     } catch (err) {
         return next(err);
     }
@@ -98,7 +97,7 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
         }
         return res.json({ job: job });
     } catch (err) {
-        return next(err)
+        return next(err);
     }
 });
 
@@ -115,11 +114,8 @@ router.delete("/:id", ensureAdmin, async function (req, res, next) {
         }
         return res.json({ message: response });
     } catch (err) {
-        return next(err)
+        return next(err);
     }
 });
-
-
-
 
 module.exports = router;
