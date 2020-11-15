@@ -3,7 +3,6 @@
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
-const { SECRET_KEY } = require("../config");
 const jwt = require("jsonwebtoken");
 const listRequirements = require("../helpers/listRequirements");
 
@@ -29,7 +28,6 @@ class Job {
             result.rows[0].requirements = arrayOfRequirements;
         }
         
-
         return result.rows[0]
     }
 
@@ -156,8 +154,6 @@ class Job {
 
         return result.rows[0]
     }
-
-
 }
 
 module.exports = Job;
