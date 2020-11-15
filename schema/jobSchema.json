@@ -63,11 +63,11 @@
         },
         "requirements": {
             "$id": "/properties/requirements",
-            "type": "string",
+            "type": "array",
             "description": "The requirements schema",
-            "default": "",
+            "default": [],
             "examples": [
-                "1,2,3"
+                ["p", "q", "string"]
             ]
         },
         "token": {

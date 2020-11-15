@@ -81,7 +81,6 @@ describe("GET /jobs/:id", function(){
                 "description": "Tech and computers",
                 "logo_url": "www.apple.com"
             },
-            "requirements": [],
             "date_posted": expect.any(String)
         }});
     });
@@ -100,9 +99,10 @@ describe("POST /jobs", function() {
                 salary: 55000,
                 equity: 0.4,
                 company_handle: "apple",
+                requirements: ["python", "javascript"],
                 token: TEST_DATA.userToken
             });
-        
+        console.log(response.body)
         expect(response.body.job).toHaveProperty('title');
         expect(response.body.job.title).toBe("UI Engineer")
     });
@@ -113,6 +113,7 @@ describe("POST /jobs", function() {
                 salary: "55000",
                 equity: 0.4,
                 company_handle: "apple",
+                requirements: ["python", "javascript"],
                 token: TEST_DATA.userToken
             });
         

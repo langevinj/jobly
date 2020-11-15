@@ -11,23 +11,21 @@ class Job {
     /** create a new job      returns
      *      {title, salary, equity, company_handle, date_posted}
      */
-    static async create({title, salary, equity, company_handle, requirements=""}) {
+    static async create({title, salary, equity, company_handle, requirements=[]}) {
         const result = await db.query(
             `INSERT INTO jobs (
                 title,
                 salary,
                 equity,
-                company_handle,
-                requirements)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, title, salary, equity, company_handle, requirements, date_posted`,
-            [title, salary, equity, company_handle, requirements]);
+                company_handle)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, title, salary, equity, company_handle, date_posted`,
+            [title, salary, equity, company_handle]);
         
-        if(requirements !== ""){
-            const arrayOfRequirements = await listRequirements(result.rows[0].id);
-            result.rows[0].requirements = arrayOfRequirements;
-        }
-        
+        // if(requirements !== ""){
+        //     const arrayOfRequirements = await listRequirements(result.rows[0].id);
+        //     result.rows[0].requirements = arrayOfRequirements;
+        // }
         return result.rows[0]
     }
 
@@ -89,7 +87,7 @@ class Job {
         }
 
         const data = result.rows[0]
-        const arrayOfRequirements = await listRequirements(id);
+        // const arrayOfRequirements = await listRequirements(id);
 
         return {
             "title": data.title,
@@ -102,7 +100,6 @@ class Job {
                 "description": data.description,
                 "logo_url": data.logo_url
             },
-            "requirements": arrayOfRequirements,
             "date_posted": data.date_posted
         }
     }
@@ -151,6 +148,32 @@ class Job {
             `INSERT INTO applications (username, job_id, state)
             VALUES($1, $2, $3) RETURNING state`, [info.username, id, data.state]
         );
+
+        return result.rows[0]
+    }
+
+    static async linkTechnologies(job_id, requirementIds){
+        for(let i=0; i<requirementIds.length; i++){
+            console.log(requirementIds[i])
+            await db.query(
+                `INSERT INTO jobs_technologies (tech_id, job_id)
+                VALUES ($1, $2)`, [requirementIds[i], job_id]
+            );
+        }
+
+        const result = await db.query(
+            `SELECT jobs.id AS id,
+                    title,
+                    salary,
+                    equity,
+                    company_handle,
+                    date_posted,
+                    array_agg(tech_name) as requirements
+            FROM jobs_technologies
+            LEFT JOIN jobs ON jobs_technologies.job_id = jobs.id
+            LEFT JOIN technologies ON jobs_technologies.tech_id = technologies.id
+            GROUP BY jobs.id`
+        )
 
         return result.rows[0]
     }

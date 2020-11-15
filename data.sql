@@ -7,7 +7,7 @@ CREATE TABLE companies (
 );
 
 CREATE TABLE technologies (
-    tech_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     tech_name text NOT NULL UNIQUE
 );
 
@@ -17,7 +17,6 @@ CREATE TABLE jobs (
     salary float NOT NULL,
     equity float NOT NULL CHECK (equity <= 1.0),
     company_handle text REFERENCES companies ON DELETE CASCADE,
-    requirements text,
     date_posted timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -40,4 +39,10 @@ CREATE TABLE applications (
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(username, job_id)
 );
+
+CREATE TABLE jobs_technologies (
+    id SERIAL PRIMARY KEY,
+    tech_id int REFERENCES technologies ON DELETE CASCADE,
+    job_id int REFERENCES jobs ON DELETE CASCADE
+)
 

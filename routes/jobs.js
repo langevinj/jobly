@@ -9,9 +9,11 @@ const jobSchema = require("../schema/jobSchema");
 const jobPartialSchema = require("../schema/jobPartialSchema");
 const ExpressError = require("../helpers/expressError");
 const applicationStateSchema = require("../schema/applicationStateSchema");
+const createRequirements = require("../helpers/createRequirements");
 
 const { authenticateJWT, ensureAdmin, ensureCorrectUser } = require("../middleware/auth");
 const validateSchema = require("../helpers/validateSchema");
+const Technologies = require("../models/technologies");
 
 const router = new express.Router();
 
@@ -61,8 +63,10 @@ router.get("/:id", authenticateJWT, async function (req, res, next) {
 router.post("/", ensureAdmin, async function (req, res, next) {
     try{
         validateSchema(req, jobSchema);
+        const requirements = await createRequirements(req.body.requirements);
         const job = await Job.create(req.body);
-        return res.json({ job : job });
+        const linkedJob = await Job.linkTechnologies(job.id, requirements.requirementIds);
+        return res.json({ job : linkedJob });
     } catch (err) {
         return next(err);
     }

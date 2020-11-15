@@ -69,6 +69,8 @@ async function beforeEachHook(TEST_DATA){
 async function afterEachHook() {
     try{
         await db.query('DELETE FROM applications');
+        await db.query('DELETE FROM jobs_technologies');
+        await db.query('DELETE FROM technologies');
         await db.query('DELETE FROM jobs');
         await db.query('DELETE FROM users');
         await db.query('DELETE FROM companies');
