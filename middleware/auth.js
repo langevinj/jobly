@@ -10,7 +10,7 @@ function authenticateJWT(req, res, next) {
     try {
         const tokenFromBody = req.body.token || req.query.token;
 
-        let token = jwt.verify(tokenFromBody, SECRET_KEY);
+        const token = jwt.verify(tokenFromBody, SECRET_KEY);
         res.locals.username = token.username
         return next();
     } catch(err) {
@@ -22,7 +22,7 @@ function ensureLoggedIn(req, res, next) {
     try{
         const tokenFromBody = req.body.token;
 
-        let token = jwt.verify(tokenFromBody, SECRET_KEY)
+        const token = jwt.verify(tokenFromBody, SECRET_KEY)
 
         res.locals.username = token.username;
 
@@ -44,7 +44,7 @@ function ensureAdmin(req, res, next) {
     try{
         const tokenFromBody = req.body.token;
 
-        let token = jwt.verify(tokenFromBody, SECRET_KEY)
+        const token = jwt.verify(tokenFromBody, SECRET_KEY)
         res.locals.username = token.username;
         res.locals.admin = token.is_admin;
 
