@@ -37,7 +37,7 @@ class User{
      *      {username, hashed_pwd, first_name, last_name}
      */
 
-     static async register({username, pwd, first_name, last_name, email, photo_url="", is_admin=false}){
+    static async register({username, pwd, first_name, last_name, email, photo_url="", is_admin=false}){
         const hashed_pwd = await bcrypt.hash(pwd, BCRYPT_WORK_FACTOR);
 
         const result = await db.query(
@@ -48,18 +48,18 @@ class User{
         );
 
         return result.rows[0]
-     }
+    }
 
      //return an array of all users 
-     static async all(){
-         const result = await db.query(`SELECT username, first_name, last_name, email FROM users`);
-         return result.rows;
-     }
+    static async all(){
+        const result = await db.query(`SELECT username, first_name, last_name, email FROM users`);
+        return result.rows;
+    }
 
-     //get a users by their username and return all fields excluding password
-     static async get(username){
-         const result = await db.query(
-             `SELECT username,
+    //get a users by their username and return all fields excluding password
+    static async get(username){
+        const result = await db.query(
+            `SELECT username,
                     first_name,
                     last_name,
                     email,
@@ -87,8 +87,8 @@ class User{
 
 
         let user = result.rows[0]
-        let allJobs = jobs.rows
-        let arrayOfJobs = []
+        const allJobs = jobs.rows
+        const arrayOfJobs = []
 
         if(jobs.rows.length !== 0){
             for (let i = 0; i < allJobs.length; i++) {
@@ -109,50 +109,49 @@ class User{
 
         user['jobs'] = arrayOfJobs
         
-
         return user
-     }
+    }
 
      /** Update an existing user and return all fields exlcuding the password
       */
 
-     static async update(username, data){
-         if(data.token){
-             delete data.token
-         }
-         let response = sqlForPartialUpdate("users", data, "username", username);
+    static async update(username, data){
+        if(data.token){
+            delete data.token
+        }
+        const response = sqlForPartialUpdate("users", data, "username", username);
 
-         const result = await db.query(response.query, response.values);
-         //indicate no user found with given username
-         if (!result.rows[0]) {
-             return null
-         }
+        const result = await db.query(response.query, response.values);
+        //indicate no user found with given username
+        if (!result.rows[0]) {
+            return null
+        }
 
-         let user = result.rows[0];
+        let user = result.rows[0];
 
          //remove these fields from the return statement
-         delete user['pwd'];
-         delete user['is_admin'];
+        delete user['pwd'];
+        delete user['is_admin'];
 
-         return user
-     }
+        return user
+    }
 
      /** Remove an existing user and return
       *     "User deleted"
       */
 
-      static async remove(username){
-          const result = await db.query(
+    static async remove(username){
+        const result = await db.query(
             `DELETE FROM users WHERE username = $1
             RETURNING username`,
             [username]);
-          //indicate no user for with given username
-          if (!result.rows[0]) {
-              return null
-          }
+        //indicate no user for with given username
+        if (!result.rows[0]) {
+            return null
+        }
 
-          return "User deleted"
-      }
+        return "User deleted"
+    }
 
 }
 
