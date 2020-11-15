@@ -3,8 +3,6 @@
 const express = require("express");
 
 const User = require("../models/user");
-const ExpressError = require("../helpers/expressError");
-const jsonschema = require("jsonschema");
 const jwt = require("jsonwebtoken");
 
 const userSchema = require("../schema/userSchema");

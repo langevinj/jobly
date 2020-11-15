@@ -17,7 +17,7 @@ function sqlForPartialUpdate(table, items, key, id) {
   // store all the columns we want to update and associate with vals
 
   let idx = 1;
-  let columns = [];
+  const columns = [];
 
   // filter out keys that start with "_" -- we don't want these in DB
   for (let key in items) {
@@ -32,10 +32,10 @@ function sqlForPartialUpdate(table, items, key, id) {
   }
 
   // build query
-  let cols = columns.join(", ");
-  let query = `UPDATE ${table} SET ${cols} WHERE ${key}=$${idx} RETURNING *`;
+  const cols = columns.join(", ");
+  const query = `UPDATE ${table} SET ${cols} WHERE ${key}=$${idx} RETURNING *`;
 
-  let values = Object.values(items);
+  const values = Object.values(items);
   values.push(id);
 
   return { query, values };
