@@ -11,7 +11,8 @@ const userSchema = require("../schema/userSchema");
 const userPartialSchema = require("../schema/userPartialSchema");
 const { json } = require("express");
 const { ensureLoggedIn } = require("../middleware/auth");
-const makeToken = require("../helpers/makeToken")
+const makeToken = require("../helpers/makeToken");
+const validateSchema = require("../helpers/validateSchema");
 
 const router = new express.Router();
 
@@ -48,15 +49,8 @@ router.get("/:username", async function (req, res, next) {
  *              {user: username}
  */
 router.post("/", async function(req, res, next) {
-    const result = jsonschema.validate(req.body, userSchema);
-
-    if (!result.valid) {
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
-    }
-
     try{
+        validateSchema(req, userSchema);
         const user = await User.register(req.body);
         let token = makeToken(user);
         return res.status(201).json({ token });
@@ -70,15 +64,8 @@ router.post("/", async function(req, res, next) {
  */
 
 router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
-    const result = jsonschema.validate(req.body, userPartialSchema);
-
-    if (!result.valid) {
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
-    }
-
     try {
+        validateSchema(req, userPartialSchema);
         const user = await User.update(req.params.username, req.body);
 
         return res.json({ user: user });
