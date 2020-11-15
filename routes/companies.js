@@ -1,16 +1,13 @@
 //Routes for companies
 
 const express = require("express");
-
 const Company = require("../models/company");
-const ExpressError = require("../helpers/expressError");
-const jsonschema = require("jsonschema");
 
 const companySchema = require("../schema/companySchema");
 const companyPartialSchema = require("../schema/companyPartialSchema");
 
-const { SECRET_KEY } = require("../config");
 const { authenticateJWT, ensureAdmin } = require("../middleware/auth");
+const validateSchema = require("../helpers/validateSchema");
 
 const router = new express.Router();
 /** GET / return the handle and name for all company objects
@@ -55,16 +52,13 @@ router.get("/:handle", authenticateJWT, async function (req, res, next) {
  */
 
 router.post("/", ensureAdmin, async function (req, res, next) {
-    const result = jsonschema.validate(req.body, companySchema)
-
-    if(!result.valid){
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
+    try{
+        validateSchema(req, companySchema);
+        const company = await Company.create(req.body);
+        return res.json({ company: company });
+    } catch (err) {
+        return next(err);
     }
-
-    const company = await Company.create(req.body);
-    return res.json({ company: company });
 });
 
 /**  PATCH /[handle] update an existing company and return
@@ -72,15 +66,8 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 */
 
 router.patch("/:handle", ensureAdmin, async function (req, res, next) {
-    const result = jsonschema.validate(req.body, companyPartialSchema)
-
-    if (!result.valid) {
-        let listOfErrors = result.errors.map(err => err.stack)
-        let error = new ExpressError(listOfErrors, 400);
-        return next(error);
-    }
-
     try{
+        validateSchema(req, companyPartialSchema);
         const company = await Company.update(req.params.handle, req.body);
         return res.json({ company: company });
     } catch (err) {
