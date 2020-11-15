@@ -10,7 +10,7 @@ const jobPartialSchema = require("../schema/jobPartialSchema");
 const ExpressError = require("../helpers/expressError");
 const applicationStateSchema = require("../schema/applicationStateSchema");
 
-const { authenticateJWT, ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
+const { authenticateJWT, ensureAdmin, ensureCorrectUser } = require("../middleware/auth");
 const validateSchema = require("../helpers/validateSchema");
 
 const router = new express.Router();
@@ -72,7 +72,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  *      {mesage: new-state}
 */
 
-router.post("/:id/apply", ensureLoggedIn, async function(req, res, next) {
+router.post("/:id/apply", ensureCorrectUser, async function(req, res, next) {
     try{
         validateSchema(req, applicationStateSchema);
         const currentState = await Job.apply(req.params.id, req.body);

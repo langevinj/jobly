@@ -18,7 +18,7 @@ function authenticateJWT(req, res, next) {
     }
 }
 
-function ensureLoggedIn(req, res, next) {
+function ensureCorrectUser(req, res, next) {
     try{
         const tokenFromBody = req.body.token;
 
@@ -60,6 +60,6 @@ function ensureAdmin(req, res, next) {
 
 module.exports = {
     authenticateJWT,
-    ensureLoggedIn,
+    ensureCorrectUser,
     ensureAdmin
 };

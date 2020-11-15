@@ -6,7 +6,7 @@ const User = require("../models/user");
 
 const userSchema = require("../schema/userSchema");
 const userPartialSchema = require("../schema/userPartialSchema");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureCorrectUser } = require("../middleware/auth");
 const makeToken = require("../helpers/makeToken");
 const validateSchema = require("../helpers/validateSchema");
 const ExpressError = require("../helpers/expressError");
@@ -61,7 +61,7 @@ router.post("/", async function(req, res, next) {
  *      {user: {username, first_name, last_name, email, photo_url}}
  */
 
-router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
+router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
     try {
         validateSchema(req, userPartialSchema);
         const user = await User.update(req.params.username, req.body);
@@ -78,7 +78,7 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
  *      {message: "User deleted"}
  */
 
-router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
+router.delete("/:username", ensureCorrectUser, async function (req, res, next) {
     try {
         const response = await User.remove(req.params.username);
         if (!response) { 
