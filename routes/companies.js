@@ -5,6 +5,7 @@ const Company = require("../models/company");
 
 const companySchema = require("../schema/companySchema");
 const companyPartialSchema = require("../schema/companyPartialSchema");
+const ExpressError = require("../helpers/expressError");
 
 const { authenticateJWT, ensureAdmin } = require("../middleware/auth");
 const validateSchema = require("../helpers/validateSchema");
@@ -26,6 +27,11 @@ router.get('/', authenticateJWT, async function (req, res, next) {
             listOfCompanies = await Company.all(req.query);
         }
 
+        //throw error if min_employees is larger than max_employees
+        if(!listOfCompanies){
+            throw new ExpressError("Invalid Parameters", 400)
+        }
+
         return res.json({ companies: listOfCompanies })  
     } catch (err) {
 
@@ -40,6 +46,9 @@ router.get('/', authenticateJWT, async function (req, res, next) {
 router.get("/:handle", authenticateJWT, async function (req, res, next) {
     try {
         const company = await Company.get(req.params.handle);
+        if(!company){
+            throw new ExpressError(`No such company with handle: ${req.params.handle}`, 404);
+        }
         return res.json({ company });
     } catch (err) {
         return next(err);
@@ -69,6 +78,9 @@ router.patch("/:handle", ensureAdmin, async function (req, res, next) {
     try{
         validateSchema(req, companyPartialSchema);
         const company = await Company.update(req.params.handle, req.body);
+        if (!company) { 
+            throw new ExpressError(`No such company with handle: ${req.params.handle}`, 404);
+        }
         return res.json({ company: company });
     } catch (err) {
         return next(err);
@@ -82,6 +94,9 @@ router.patch("/:handle", ensureAdmin, async function (req, res, next) {
 router.delete("/:handle", ensureAdmin, async function (req, res, next) {
     try {
         const response = await Company.remove(req.params.handle);
+        if(!response){
+            throw new ExpressError(`No such company with handle: ${req.params.handle}`, 404);
+        }
         return res.json({message: response});
     } catch (err) {
         return next(err);

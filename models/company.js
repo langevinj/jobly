@@ -1,4 +1,5 @@
 //Model for the Company class
+
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
@@ -36,7 +37,7 @@ class Company {
         const result = await db.query(`SELECT handle, name FROM companies`);
         return result.rows;
     } else {
-        let columns = [];
+        const columns = [];
         if('search' in parameters){
             columns.push(`name ILIKE '%${parameters['search']}%'`)
         } 
@@ -49,10 +50,10 @@ class Company {
             columns.push(`num_employees < ${parameters['max_employees']}`)
         }
 
-        //throw error if min_exployees > max_employees
+        //return null to indicate error if min_exployees > max_employees
         if (parameters.min_employees && parameters.max_employees) {
             if (parseInt(parameters['min_employees']) > parseInt(parameters['max_employees'])) {
-                throw new ExpressError("Incorrect parameters", 400)
+                return null;
             } 
         }
 
@@ -78,9 +79,10 @@ class Company {
                 logo_url
             FROM companies
             WHERE handle = $1`, [handle]);
-
+      
+      //indicate error if no results are found
       if(!result.rows[0]){
-        throw new ExpressError(`No such company with handle: ${handle}`, 404);
+        return null;
       }
 
       let company = result.rows[0]
@@ -105,11 +107,12 @@ class Company {
       if(data.token){
           delete data.token
       }
-      let response = sqlForPartialUpdate("companies", data, "handle", handle)
+      const response = sqlForPartialUpdate("companies", data, "handle", handle)
       const result = await db.query(response.query, response.values)
 
+      //indicate error if no company with this handle
       if(!result.rows[0]){
-          throw new ExpressError(`No such company with handle: ${handle}`, 404);
+          return null;
       }
 
       return result.rows[0]
@@ -122,9 +125,9 @@ class Company {
     const result = await db.query(
         `DELETE FROM companies WHERE handle = $1
             RETURNING handle`, [handle]);
-    
+    //indicate company not found
     if(!result.rows[0]){
-        throw new ExpressError(`No such company with handle: ${handle}`, 404);
+        return null
     }
 
     return "Company deleted"
