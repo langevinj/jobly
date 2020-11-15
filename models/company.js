@@ -57,7 +57,7 @@ class Company {
         }
 
         //construct query with parameters
-        let cols = columns.join(' AND ');
+        const cols = columns.join(' AND ');
         const result = await db.query(`SELECT handle, name FROM companies
                         WHERE ${cols}`)
         return result.rows
@@ -84,10 +84,10 @@ class Company {
         return null;
       }
 
-      let company = result.rows[0]
+      const company = result.rows[0]
 
       const allJobs = await Job.all()
-      let arrayOfJobs = [];
+      const arrayOfJobs = [];
       for(let i=0; i<allJobs.length; i++){
         if(allJobs[i].company_handle === handle){
             arrayOfJobs.push(allJobs[i])
@@ -131,19 +131,7 @@ class Company {
 
     return "Company deleted"
   }
-
-  
 }
-
-
-
-
-
-
-
-
-
-
 
 
 module.exports = Company;
